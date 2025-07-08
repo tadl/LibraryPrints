@@ -1,0 +1,30 @@
+<h1>3D Printing Service at TADL</h1>
+<p>
+  Our library offers 3D printing for patrons—check out our details on
+  <a href="https://www.tadl.org/services/3d-printing" target="_blank">tadl.org</a>.
+</p>
+
+<%= form_with url: submit_job_path, scope: nil, local: true do |f| %>
+  <fieldset>
+    <legend>Your Information</legend>
+    <label>Email:</label>
+    <%= f.email_field :email, name: 'patron[email]', required: true %>
+
+    <label>Name:</label>
+    <%= f.text_field :name, name: 'patron[name]' %>
+  </fieldset>
+
+  <fieldset>
+    <legend>Print Job Details</legend>
+    <label>Description:</label>
+    <%= f.text_area :description, name: 'print_job[description]', required: true %>
+
+    <label>Quantity:</label>
+    <%= f.number_field :quantity, name: 'print_job[quantity]', value: 1, min: 1, required: true %>
+
+    <label>Additional Notes:</label>
+    <%= f.text_area :notes, name: 'print_job[notes]' %>
+  </fieldset>
+
+  <%= f.submit 'Submit Print Job' %>
+<% end %>
