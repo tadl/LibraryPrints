@@ -1,0 +1,24 @@
+<!-- app/views/portal/show.html.erb -->
+<h1>Print Request #<%= @print_job.id %></h1>
+
+<p><strong>Status:</strong> <%= @print_job.status.humanize %></p>
+<p><strong>Submitted:</strong> <%= @print_job.created_at.strftime("%b %-d, %Y %l:%M %p") %></p>
+
+<% if @print_job.model_file.attached? %>
+  <p>
+    <strong>Model file:</strong>
+    <%= link_to @print_job.model_file.filename.to_s,
+                rails_blob_path(@print_job.model_file, disposition: "attachment") %>
+  </p>
+<% elsif @print_job.url.present? %>
+  <p>
+    <strong>Model URL:</strong>
+    <%= link_to @print_job.url, @print_job.url, target: "_blank" %>
+  </p>
+<% end %>
+
+<p><strong>Filament color:</strong> <%= @print_job.filament_color %></p>
+<p><strong>Pickup location:</strong> <%= @print_job.pickup_location.humanize %></p>
+<p><strong>Notes:</strong> <%= @print_job.notes.presence || "—" %></p>
+
+<%= link_to "Back to Dashboard", dashboard_path(token: @patron.access_token) %>

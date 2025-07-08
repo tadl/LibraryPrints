@@ -1,30 +1,89 @@
-<h1>3D Printing Service at TADL</h1>
-<p>
-  Our library offers 3D printing for patrons—check out our details on
-  <a href="https://www.tadl.org/services/3d-printing" target="_blank">tadl.org</a>.
-</p>
+<!-- app/views/portal/home.html.erb -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Print Request Form</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    fieldset { margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ccc; }
+    legend { font-weight: bold; }
+    label { display: block; margin-top: 0.5rem; }
+    input, textarea, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
+    .help-text { font-size: 0.9rem; color: #666; }
+    .submit-button { padding: 0.75rem 1.5rem; font-size: 1rem; }
+  </style>
+</head>
 
-<%= form_with url: submit_job_path, scope: nil, local: true do |f| %>
-  <fieldset>
-    <legend>Your Information</legend>
-    <label>Email:</label>
-    <%= f.email_field :email, name: 'patron[email]', required: true %>
+<body>
+  <h1>3D Print Request Form</h1>
+  <p>Learn more about our 3D printing service on <a href="https://www.tadl.org/services/3d-printing" target="_blank">tadl.org/services/3d-printing</a>.</p>
 
-    <label>Name:</label>
-    <%= f.text_field :name, name: 'patron[name]' %>
-  </fieldset>
+  <%= form_tag submit_job_path, multipart: true, local: true do %>
+    <fieldset>
+      <legend>Name</legend>
+      <label for="patron_first_name">First Name</label>
+      <%= text_field_tag 'patron[first_name]', nil, id: 'patron_first_name', required: true %>
 
-  <fieldset>
-    <legend>Print Job Details</legend>
-    <label>Description:</label>
-    <%= f.text_area :description, name: 'print_job[description]', required: true %>
+      <label for="patron_last_name">Last Name</label>
+      <%= text_field_tag 'patron[last_name]', nil, id: 'patron_last_name', required: true %>
 
-    <label>Quantity:</label>
-    <%= f.number_field :quantity, name: 'print_job[quantity]', value: 1, min: 1, required: true %>
+      <label for="patron_email">Email Address</label>
+      <%= email_field_tag 'patron[email]', nil, id: 'patron_email', required: true %>
+    </fieldset>
 
-    <label>Additional Notes:</label>
-    <%= f.text_area :notes, name: 'print_job[notes]' %>
-  </fieldset>
+    <fieldset>
+      <legend>Model File</legend>
+      <label for="print_job_model_file">Choose File</label>
+      <%= file_field_tag 'print_job[model_file]', accept: '.stl,.obj', id: 'print_job_model_file', required: true %>
+      <p class="help-text">One file only. 100 MB limit. Allowed types: stl, obj.</p>
+    </fieldset>
 
-  <%= f.submit 'Submit Print Job' %>
-<% end %>
+    <fieldset>
+      <legend>URL</legend>
+      <label for="print_job_url">URL</label>
+      <%= url_field_tag 'print_job[url]', nil, id: 'print_job_url' %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Filament Color Preference</legend>
+      <label for="print_job_filament_color">Choose a color</label>
+      <%= select_tag 'print_job[filament_color]',
+            options_for_select([
+              'Green','Pink','Yellow','Red','White','Black',
+              'Orange','Blue','Purple','Gray','Light Cyan','Other'
+            ]),
+            include_blank: 'Select color',
+            id: 'print_job_filament_color' %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Notes</legend>
+      <label for="print_job_notes">Notes</label>
+      <%= text_area_tag 'print_job[notes]', nil, id: 'print_job_notes', rows: 4 %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Pickup Location</legend>
+      <label for="print_job_pickup_location">Select Location</label>
+      <%= select_tag 'print_job[pickup_location]',
+            options_for_select([
+              ['Main Library','main_library'],
+              ['East Bay','east_bay']
+            ]),
+            id: 'print_job_pickup_location' %>
+      <p class="help-text">Select a location where you'd like to pick up your object.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>CAPTCHA</legend>
+      <p>This question is for testing whether or not you are a human visitor and to prevent automated spam submissions.</p>
+      <label for="captcha_field">Enter any word:</label>
+      <%= text_field_tag 'captcha', nil, id: 'captcha_field' %>
+    </fieldset>
+
+    <%= submit_tag 'Submit Print Job', class: 'submit-button' %>
+  <% end %>
+</body>
+</html>

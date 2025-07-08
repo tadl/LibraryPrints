@@ -1,0 +1,35 @@
+<!-- app/views/portal/dashboard.html.erb -->
+<h1>Your Print Jobs</h1>
+
+<% @print_jobs.each do |job| %>
+  <div class="job">
+    <p><strong>Submitted:</strong> <%= job.created_at.to_formatted_s(:long) %></p>
+
+    <% if job.model_file.attached? %>
+      <p>
+        <strong>Model:</strong>
+        <%= link_to job.model_file.filename,
+                    rails_blob_path(job.model_file, disposition: "attachment") %>
+      </p>
+    <% end %>
+
+    <% if job.url.present? %>
+      <p><strong>URL:</strong> <%= link_to job.url, job.url, target: "_blank" %></p>
+    <% end %>
+
+    <p><strong>Filament color:</strong> <%= job.filament_color %></p>
+    <p><strong>Pickup location:</strong> <%= job.pickup_location.humanize %></p>
+    <p><strong>Notes:</strong> <%= job.notes.presence || "—" %></p>
+
+    <p>
+      <%= link_to "View details",
+            url_for(
+              controller: 'portal',
+              action:     'show',
+              id:         job.id,
+              token:      @patron.access_token
+            ) %>
+    </p>
+  </div>
+  <hr>
+<% end %>

@@ -1,3 +1,4 @@
+# app/controllers/portal_controller.rb
 class PortalController < ApplicationController
   layout 'application'
 
@@ -6,29 +7,38 @@ class PortalController < ApplicationController
 
   # Public landing page with info and submission form
   def home
+    @print_job = PrintJob.new
   end
 
   # Handle print job submission from public form
   def create_job
     # Find or create a patron by email
-    patron_params = params.require(:patron).permit(:email, :name)
-    @patron = Patron.find_or_initialize_by(email: patron_params[:email])
+    p = params.require(:patron).permit(:first_name, :last_name, :email)
+    @patron = Patron.find_or_initialize_by(email: p[:email])
     if @patron.new_record?
-      @patron.name = patron_params[:name]
+      @patron.name = "#{p[:first_name]} #{p[:last_name]}"
       @patron.save!
     end
 
-    # Generate a fresh access token and email link
-    @patron.generate_access_token
-    @patron.save!
+    # Generate a fresh access token and e-mail link
+    @patron.regenerate_access_token!
     PatronMailer.access_link(@patron).deliver_later
 
-    # Create the print job tied to this patron
-    job_params = params.require(:print_job).permit(:description, :quantity, :notes)
-    @print_job = @patron.print_jobs.build(job_params)
+    # Build the print job tied to this patron
+    jp = params.require(:print_job).permit(
+      :model_file,
+      :url,
+      :filament_color,
+      :notes,
+      :pickup_location
+    )
+    @print_job = @patron.print_jobs.build(jp)
+    @print_job.status = 'pending'
+
     if @print_job.save
       redirect_to thank_you_path
     else
+      flash.now[:alert] = @print_job.errors.full_messages.join(", ")
       render :home, status: :unprocessable_entity
     end
   end
@@ -66,4 +76,4 @@ class PortalController < ApplicationController
     # Store token in session for subsequent requests
     session[:patron_token] ||= token
   end
-end 
+end

@@ -1,0 +1,10 @@
+# app/views/patron_mailer/access_link.html.erb
+<p>Hello <%= @patron.name %>,</p>
+
+<p>Thanks for submitting a 3D print request. You can view your job status (and submit new ones) by clicking the link below:</p>
+
+<p>
+  <%= link_to "View your print jobs", dashboard_url(token: @patron.access_token) %>
+</p>
+
+<p>— Your TADL Makerspace</p>
