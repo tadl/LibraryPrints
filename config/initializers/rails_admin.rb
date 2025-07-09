@@ -36,9 +36,10 @@ RailsAdmin.config do |config|
     delete
   end
 
-  # You can further customize model config here...
   config.model 'FilamentColor' do
     navigation_label 'Form Options'
+    weight 100
+    label_plural 'Filament Colors'
     list do
       sort_by :name
       field :name
@@ -52,6 +53,8 @@ RailsAdmin.config do |config|
 
   config.model 'PickupLocation' do
     navigation_label 'Form Options'
+    weight 110
+    label_plural 'Pickup Locations'
     list do
       sort_by :name
       field :name
@@ -64,5 +67,24 @@ RailsAdmin.config do |config|
       field :active
     end
   end
+
+  config.model 'Patron' do
+    navigation_label 'Admin'
+    weight 200
+    label_plural   'Patrons'
+  end
+
+  config.model 'StaffUser' do
+    navigation_label 'Admin'
+    weight 210
+    label_plural   'Staff Users'
+  end
+
+  config.model 'PrintJob' do
+    navigation_label 'Print Management'
+    weight 300
+    label_plural   'Print Jobs'
+  end
+
 
 end
