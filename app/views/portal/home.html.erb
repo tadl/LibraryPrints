@@ -5,7 +5,6 @@
   <!-- Calls to action -->
   <div class="cta">
     <%= link_to 'Submit a New Request', submit_job_path %>
-    <%= link_to 'Request Access Link', token_request_path %>
   </div>
 
   <!-- Live queue stats -->
@@ -37,27 +36,12 @@
     </ul>
   </section>
 
-  <!-- FAQ -->
-  <section class="faq">
-    <h2>FAQ</h2>
-    <details>
-      <summary>How do I prepare my file?</summary>
-      <p>Ensure your model is manifold and exported as STL or OBJ.</p>
-    </details>
-    <details>
-      <summary>What if my print fails?</summary>
-      <p>We’ll contact you if there’s an issue.</p>
-    </details>
-    <details>
-      <summary>Can I request multiple copies?</summary>
-      <p>Yes; please specify quantity in the notes field.</p>
-    </details>
+  <section>
+    <h2>Already Submitted a Request?</h2>
+    <p>Lost your magic link? No problem—click the button below to have a new access link sent to your email so you can track and manage your print jobs.</p>
+    <div class="cta">
+      <%= link_to 'Request New Access Link', token_request_path %>
+    </div>
   </section>
 
-  <!-- Contact -->
-  <section class="contact">
-    <h2>Contact &amp; Hours</h2>
-    <p>Email: <a href="mailto:3d@tadl.org">3d@tadl.org</a></p>
-    <p>Main Library, Mon–Fri 9 AM–5 PM</p>
-  </section>
 </div>
