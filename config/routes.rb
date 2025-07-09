@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
   root to: 'portal#home'
-  post '/submit', to: 'portal#create_job',   as: :submit_job
+  get '/submit', to: 'portal#submit',        as: 'submit_job'
+  post '/submit', to: 'portal#create_job'
   get  '/thank_you', to: 'portal#thank_you', as: :thank_you
 
   get '/dashboard', to: 'portal#dashboard', as: :dashboard

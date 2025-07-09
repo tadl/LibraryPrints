@@ -10,6 +10,9 @@ class PortalController < ApplicationController
     @print_job = PrintJob.new
   end
 
+  def submit
+  end
+
   # Handle print job submission from public form
   def create_job
     # Find or create a patron by email

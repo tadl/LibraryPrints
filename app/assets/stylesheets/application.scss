@@ -1,0 +1,209 @@
+/* app/assets/stylesheets/application.scss */
+/*
+ *= require_tree .
+ *= require_self
+ */
+
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+/* Reset & base rules */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* use Open Sans first, fall back to system sans */
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  color: #333;
+  background-color: #f9f9f9;
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  background-color: #004B8D;
+  background-image: image-url('header-bg.jpg');
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: cover;
+  color: #fff;
+  padding: 1.5rem;
+  text-align: left;
+
+  .logo {
+    width: 250px;
+    height: auto;
+    display: block;
+  }
+}
+
+/* Layout containers */
+.container,
+.content {
+  padding: 2rem;
+}
+
+main {
+  padding: 2rem 1rem;
+}
+
+/* Headings & text */
+h1 {
+  margin-top: 0;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+/* Utility link styles */
+a.view-link,
+a.back-link {
+  display: inline-block;
+  font-weight: bold;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+a.view-link {
+  margin-top: 0.5rem;
+  color: #005BA8;
+}
+
+a.back-link {
+  margin-top: 2rem;
+  color: #333;
+}
+
+/* Call-to-action buttons */
+.cta {
+  margin: 2rem 0;
+
+  a {
+    display: inline-block;
+    margin-right: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #002F5F;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+
+    &:hover { opacity: 0.9; }
+  }
+}
+
+/* Submit button */
+.submit-button {
+  display: block;
+  width: 100%;
+  background-color: #FFB81C;
+  color: #002F5F;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+
+  &:hover { background-color: #e6a918; }
+}
+
+/* Job listing */
+.job {
+  padding: 1rem 0;
+
+  & + .job {
+    border-top: 1px solid #ddd;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+}
+
+/* “View details” link */
+.view-link {
+  @extend a.view-link;
+}
+
+/* Stats boxes */
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.stat {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 4px;
+
+  strong {
+    display: block;
+    font-size: 2rem;
+    color: #002F5F;
+  }
+}
+
+/* Sections & FAQs */
+section {
+  margin-bottom: 2rem;
+
+  h2 {
+    margin-bottom: 0.5rem;
+    color: #002F5F;
+  }
+}
+
+.faq details {
+  margin-bottom: 1rem;
+}
+
+/* Contact blocks */
+.contact p {
+  margin: 0.25rem 0;
+}
+
+/* Form elements */
+fieldset {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 0.5rem;
+}
+
+label {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.help-text {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
