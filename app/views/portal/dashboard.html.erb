@@ -1,48 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Print Jobs</title>
-</head>
-<body>
-  <%= render "shared/header" %>
-  <div class="content">
-    <h1>Your Print Jobs</h1>
+<%= render "shared/header" %>
+<div class="content">
+  <h1>Your Print Jobs</h1>
 
-    <% @print_jobs.each do |job| %>
-      <div class="job">
-        <p><strong>Submitted:</strong> <%= job.created_at.to_formatted_s(:long) %></p>
+  <% @print_jobs.each do |job| %>
+    <div class="job">
+      <p><strong>Submitted:</strong> <%= job.created_at.to_formatted_s(:long) %></p>
 
-        <% if job.model_file.attached? %>
-          <p>
-            <strong>Model file:</strong>
-            <%= link_to job.model_file.filename.to_s,
-                        rails_blob_path(job.model_file, disposition: "attachment") %>
-          </p>
-        <% end %>
+      <% if job.model_file.attached? %>
+        <p>
+          <strong>Model file:</strong>
+          <%= link_to job.model_file.filename.to_s,
+                      rails_blob_path(job.model_file, disposition: "attachment") %>
+        </p>
+      <% end %>
 
-        <% if job.url.present? %>
-          <p>
-            <strong>URL:</strong>
-            <%= link_to job.url, job.url, target: "_blank", rel: "noopener" %>
-          </p>
-        <% end %>
+      <% if job.url.present? %>
+        <p>
+          <strong>URL:</strong>
+          <%= link_to job.url, job.url, target: "_blank", rel: "noopener" %>
+        </p>
+      <% end %>
 
-        <p><strong>Filament color:</strong> <%= job.filament_color %></p>
-        <p><strong>Pickup location:</strong> <%= job.pickup_location.humanize %></p>
-        <p><strong>Notes:</strong> <%= job.notes.presence || "—" %></p>
+      <p><strong>Filament color:</strong> <%= job.filament_color %></p>
+      <p><strong>Pickup location:</strong> <%= job.pickup_location.humanize %></p>
+      <p><strong>Notes:</strong> <%= job.notes.presence || "—" %></p>
 
-        <%= link_to "View details →",
-              url_for(
-                controller: 'portal',
-                action:     'show',
-                id:         job.id,
-                token:      @patron.access_token
-              ),
-              class: "view-link" %>
-      </div>
-    <% end %>
-  </div>
-</body>
-</html>
+      <%= link_to "View details →",
+            url_for(
+              controller: 'portal',
+              action:     'show',
+              id:         job.id,
+              token:      @patron.access_token
+            ),
+            class: "view-link" %>
+    </div>
+  <% end %>
+</div>

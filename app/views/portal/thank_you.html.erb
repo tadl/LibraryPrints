@@ -1,21 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thank You!</title>
-</head>
-<body>
-  <header class="header">
-    <%= image_tag "tadl-logo.svg", alt: "TADL Logo", class: "logo" %>
-  </header>
+<%= render 'shared/header' %>
 
-  <div class="content">
-    <h1>Thank You!</h1>
-    <p>
-      We've emailed you a secure link to track and manage your 3D print job.
-      Please check your inbox (and spam folder).
-    </p>
-  </div>
-</body>
-</html>
+<div class="content">
+  <h1>Thank You!</h1>
+  <p>
+    We've emailed you a secure link to track and manage your 3D print job.
+    Please check your inbox (and spam folder).
+  </p>
+</div>

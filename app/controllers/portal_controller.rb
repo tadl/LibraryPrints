@@ -2,15 +2,17 @@
 class PortalController < ApplicationController
   layout 'application'
 
-  # Load patron for dashboard and job details only
+  # Only dashboard and show require a logged-in patron (via magic token)
   before_action :load_patron, only: [:dashboard, :show]
 
-  # Public landing page with info and submission form
+  # Public landing page with info and a link to the submission form
   def home
-    @print_job = PrintJob.new
+    # could show overview, queue stats, links to submit or request a token
   end
 
+  # Display the 3D print submission form
   def submit
+    @print_job = PrintJob.new
   end
 
   # Handle print job submission from public form
@@ -23,11 +25,11 @@ class PortalController < ApplicationController
       @patron.save!
     end
 
-    # Generate a fresh access token and e-mail link
+    # Generate a fresh access token and email link
     @patron.regenerate_access_token!
     PatronMailer.access_link(@patron).deliver_later
 
-    # Build the print job tied to this patron
+    # Build and save the print job
     jp = params.require(:print_job).permit(
       :model_file,
       :url,
@@ -41,28 +43,51 @@ class PortalController < ApplicationController
     if @print_job.save
       redirect_to thank_you_path
     else
-      flash.now[:alert] = @print_job.errors.full_messages.join(", ")
-      render :home, status: :unprocessable_entity
+      flash.now[:alert] = @print_job.errors.full_messages.to_sentence
+      render :submit, status: :unprocessable_entity
     end
   end
 
-  # Simple thank-you confirmation page
+  # Confirmation page after a successful print-job submission
   def thank_you
   end
 
-  # Patron dashboard, shows previous and current jobs
+  # Show form where a patron enters their email to request a magic link
+  def token_request
+  end
+
+  # Handle the email-submission for a magic-link request
+  def create_token_request
+    p = params.require(:patron).permit(:email)
+    @patron = Patron.find_by(email: p[:email])
+
+    unless @patron
+      flash.now[:alert] = "We couldn't find that email address."
+      return render :token_request, status: :unprocessable_entity
+    end
+
+    @patron.regenerate_access_token!
+    PatronMailer.access_link(@patron).deliver_later
+    redirect_to token_thank_you_path
+  end
+
+  # Confirmation page after sending the magic-link email
+  def token_thank_you
+  end
+
+  # Patron dashboard: lists their print jobs
   def dashboard
     @print_jobs = @patron.print_jobs.order(created_at: :desc)
   end
 
-  # Show details about a single print job
+  # Show details for a single print job
   def show
     @print_job = @patron.print_jobs.find(params[:id])
   end
 
   private
 
-  # Load and validate patron by magic-link token
+  # Load and validate patron by magic-link token (in params or session)
   def load_patron
     token = params[:token] || session[:patron_token]
     head :unauthorized and return unless token

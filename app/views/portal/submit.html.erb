@@ -1,93 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>3D Print Request Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
+<%= render 'shared/header' %>
 
-  <header class="header">
-    <%= image_tag "tadl-logo.svg", alt: "TADL Logo", class: "logo" %>
-  </header>
+<main>
+  <h1>3D Print Request Form</h1>
+  <p class="info">
+    Learn more at
+    <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener">
+      tadl.org/services/3d-printing
+    </a>
+  </p>
+  <%= form_tag submit_job_path, multipart: true, local: true do %>
+    <fieldset>
+      <legend>Name</legend>
+      <label for="patron_first_name">First Name</label>
+      <%= text_field_tag 'patron[first_name]', nil, id: 'patron_first_name', required: true %>
 
-  <main>
-    <h1>3D Print Request Form</h1>
-    <p class="info">
-      Learn more at
-      <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener">
-        tadl.org/services/3d-printing
-      </a>
-    </p>
-    <%= form_tag submit_job_path, multipart: true, local: true do %>
-      <fieldset>
-        <legend>Name</legend>
-        <label for="patron_first_name">First Name</label>
-        <%= text_field_tag 'patron[first_name]', nil, id: 'patron_first_name', required: true %>
+      <label for="patron_last_name">Last Name</label>
+      <%= text_field_tag 'patron[last_name]', nil, id: 'patron_last_name', required: true %>
 
-        <label for="patron_last_name">Last Name</label>
-        <%= text_field_tag 'patron[last_name]', nil, id: 'patron_last_name', required: true %>
+      <label for="patron_email">Email Address</label>
+      <%= email_field_tag 'patron[email]', nil, id: 'patron_email', required: true %>
+    </fieldset>
 
-        <label for="patron_email">Email Address</label>
-        <%= email_field_tag 'patron[email]', nil, id: 'patron_email', required: true %>
-      </fieldset>
+    <fieldset>
+      <legend>Model File</legend>
+      <label for="print_job_model_file">Choose File</label>
+      <%= file_field_tag 'print_job[model_file]', accept: '.stl,.obj', id: 'print_job_model_file' %>
+      <p class="help-text">
+        Allowed types: stl, obj.
+      </p>
+    </fieldset>
 
-      <fieldset>
-        <legend>Model File</legend>
-        <label for="print_job_model_file">Choose File</label>
-        <%= file_field_tag 'print_job[model_file]', accept: '.stl,.obj', id: 'print_job_model_file' %>
-        <p class="help-text">
-          Allowed types: stl, obj.
-        </p>
-      </fieldset>
+    <fieldset>
+      <legend>URL</legend>
+      <label for="print_job_url">URL to model</label>
+      <%= url_field_tag 'print_job[url]', nil, id: 'print_job_url' %>
+    </fieldset>
 
-      <fieldset>
-        <legend>URL</legend>
-        <label for="print_job_url">URL to model</label>
-        <%= url_field_tag 'print_job[url]', nil, id: 'print_job_url' %>
-      </fieldset>
+    <fieldset>
+      <legend>Filament Color Preference</legend>
+      <label for="print_job_filament_color">Choose a color</label>
+      <%= select_tag 'print_job[filament_color]',
+            options_from_collection_for_select(
+              FilamentColor.all, :code, :name, selected: @print_job.filament_color
+            ),
+            include_blank: 'Select color',
+            id: 'print_job_filament_color' %>
+    </fieldset>
 
-      <fieldset>
-        <legend>Filament Color Preference</legend>
-        <label for="print_job_filament_color">Choose a color</label>
-        <%= select_tag 'print_job[filament_color]',
-              options_for_select([
-                'Green','Pink','Yellow','Red','White','Black',
-                'Orange','Blue','Purple','Gray','Light Cyan','Other'
-              ]),
-              include_blank: 'Select color',
-              id: 'print_job_filament_color' %>
-      </fieldset>
+    <fieldset>
+      <legend>Notes</legend>
+      <label for="print_job_notes">Additional instructions</label>
+      <%= text_area_tag 'print_job[notes]', nil,
+            id: 'print_job_notes', rows: 4,
+            placeholder: 'Add any special instructions or context' %>
+    </fieldset>
 
-      <fieldset>
-        <legend>Notes</legend>
-        <label for="print_job_notes">Additional instructions</label>
-        <%= text_area_tag 'print_job[notes]', nil,
-              id: 'print_job_notes', rows: 4,
-              placeholder: 'Add any special instructions or context' %>
-      </fieldset>
+    <fieldset>
+      <legend>Pickup Location</legend>
+      <label for="print_job_pickup_location">Select Location</label>
+      <%= select_tag 'print_job[pickup_location]',
+            options_for_select(
+              PickupLocation.active.order(:position).pluck(:name, :code),
+              'wood'
+            ),
+            id: 'print_job_pickup_location' %>
+      <p class="help-text">
+        Choose where you’ll pick up your print.
+      </p>
+    </fieldset>
 
-      <fieldset>
-        <legend>Pickup Location</legend>
-        <label for="print_job_pickup_location">Select Location</label>
-        <%= select_tag 'print_job[pickup_location]',
-              options_for_select([['Main Library','main_library'],['East Bay','east_bay']]),
-              id: 'print_job_pickup_location' %>
-        <p class="help-text">
-          Choose where you’ll pick up your print.
-        </p>
-      </fieldset>
+    <fieldset>
+      <legend>CAPTCHA</legend>
+      <p>This helps prevent automated spam:</p>
+      <label for="captcha_field">Enter any word:</label>
+      <%= text_field_tag 'captcha', nil, id: 'captcha_field', required: true %>
+    </fieldset>
 
-      <fieldset>
-        <legend>CAPTCHA</legend>
-        <p>This helps prevent automated spam:</p>
-        <label for="captcha_field">Enter any word:</label>
-        <%= text_field_tag 'captcha', nil, id: 'captcha_field', required: true %>
-      </fieldset>
-
-      <%= submit_tag 'Submit Print Job', class: 'submit-button' %>
-    <% end %>
-  </main>
-
-</body>
-</html>
+    <%= submit_tag 'Submit Print Job', class: 'submit-button' %>
+  <% end %>
+</main>

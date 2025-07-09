@@ -24,11 +24,8 @@ class PrintJob < ApplicationRecord
                       message: 'must be a valid URL' },
             allow_blank: true
 
-  # Pickup locations (expand later via RailsAdmin)
-  validates :pickup_location,
-            inclusion: { in: %w[main_library east_bay],
-                         message: 'is not a valid pickup location' },
-            allow_blank: true
+  # Ensure pickup_location is always set
+  validates :pickup_location, presence: true
 
   # Filament color free-text (we’ll drive the list from the form/UI)
   validates :filament_color, length: { maximum: 50 }, allow_blank: true

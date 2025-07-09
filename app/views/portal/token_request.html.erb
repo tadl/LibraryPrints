@@ -1,0 +1,12 @@
+<%= render 'shared/header' %>
+
+<div class="content">
+  <h1>Get Your Magic Link</h1>
+  <p>Enter your email and we’ll send you a secure link to view your 3D print jobs.</p>
+
+  <%= form_tag token_request_path, method: :post, local: true do %>
+    <label for="patron_email"><strong>Email Address</strong></label>
+    <%= email_field_tag 'patron[email]', nil, id: 'patron_email', required: true %>
+    <%= submit_tag 'Send Me the Link', class: 'view-link' %>
+  <% end %>
+</div>

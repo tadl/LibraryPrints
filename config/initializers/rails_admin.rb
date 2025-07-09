@@ -23,7 +23,7 @@ RailsAdmin.config do |config|
 
   # === UI & Actions Configuration (example) ===
   config.main_app_name = ['Library Prints', 'Admin']
-  config.included_models = %w[StaffUser Patron PrintJob]
+  config.included_models = %w[StaffUser Patron PrintJob FilamentColor PickupLocation]
 
   config.actions do
     dashboard                     # mandatory
@@ -37,4 +37,32 @@ RailsAdmin.config do |config|
   end
 
   # You can further customize model config here...
+  config.model 'FilamentColor' do
+    navigation_label 'Form Options'
+    list do
+      sort_by :name
+      field :name
+      field :code
+    end
+    edit do
+      field :name
+      field :code
+    end
+  end
+
+  config.model 'PickupLocation' do
+    navigation_label 'Form Options'
+    list do
+      sort_by :name
+      field :name
+      field :code
+      field :active
+    end
+    edit do
+      field :name
+      field :code
+      field :active
+    end
+  end
+
 end

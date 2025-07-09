@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_08_215748) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_09_220317) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_08_215748) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "filament_colors", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "patrons", force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -51,6 +59,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_08_215748) do
     t.datetime "updated_at", null: false
     t.index ["access_token"], name: "index_patrons_on_access_token", unique: true
     t.index ["email"], name: "index_patrons_on_email", unique: true
+  end
+
+  create_table "pickup_locations", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "active", default: true, null: false
   end
 
   create_table "print_jobs", force: :cascade do |t|

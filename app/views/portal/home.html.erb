@@ -1,71 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TADL 3D Print Management System</title>
-</head>
-<body>
-  <header class="header">
-    <%= image_tag 'tadl-logo.svg', alt: 'TADL Logo', class: 'logo' %>
-  </header>
+<%= render 'shared/header' %>
 
-  <div class="container">
-    <h1>TADL 3D Print Management System</h1>
-    <!-- Calls to action -->
-    <div class="cta">
-      <%= link_to 'Submit a New Request', submit_job_path %>
-    </div>
+<div class="container">
+  <h1>TADL 3D Print Management System</h1>
+  <!-- Calls to action -->
+  <div class="cta">
+    <%= link_to 'Submit a New Request', submit_job_path %>
+    <%= link_to 'Request Access Link', token_request_path %>
+  </div>
 
-    <!-- Live queue stats -->
+  <!-- Live queue stats -->
+  <section>
+    <h2>3D Printing Stats</h2>
     <div class="stats">
       <div class="stat"><strong><%= PrintJob.pending.count %></strong> Pending</div>
       <div class="stat"><strong><%= PrintJob.queued.count %></strong> Queued</div>
       <div class="stat"><strong><%= PrintJob.printing.count %></strong> Printing</div>
       <div class="stat"><strong><%= PrintJob.ready_for_pickup.count %></strong> Ready</div>
     </div>
+  </section>
 
-    <!-- About -->
-    <section class="about">
-      <h2>About Our 3D Printing Service</h2>
-      <p>TADL’s 3D Printing service lets you turn your digital design into a real object—perfect for prototypes, spare parts, and more.</p>
-      <p>Learn more at <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener">tadl.org/services/3d-printing</a>.</p>
-    </section>
+  <!-- About -->
+  <section class="about">
+    <h2>About Our 3D Printing Service</h2>
+    <p>TADL’s 3D Printing service lets you turn your digital design into a real object—perfect for prototypes, spare parts, and more.</p>
+    <p>Learn more at <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener">tadl.org/services/3d-printing</a>.</p>
+  </section>
 
-    <!-- Pricing & guidelines -->
-    <section class="pricing">
-      <h2>Pricing &amp; Guidelines</h2>
-      <ul>
-        <li><strong>Cost:</strong> $0.10/gram</li>
-        <li><strong>Materials:</strong> PLA (various colors)</li>
-        <li><strong>File Types:</strong> STL or OBJ</li>
-        <li><strong>Turnaround:</strong> Typically 2–5 business days</li>
-      </ul>
-    </section>
+  <!-- Pricing & guidelines -->
+  <section class="pricing">
+    <h2>Pricing &amp; Guidelines</h2>
+    <ul>
+      <li><strong>Cost:</strong> $0.10/gram</li>
+      <li><strong>Materials:</strong> PLA (various colors)</li>
+      <li><strong>File Types:</strong> STL or OBJ</li>
+      <li><strong>Turnaround:</strong> Typically 2–5 business days</li>
+    </ul>
+  </section>
 
-    <!-- FAQ -->
-    <section class="faq">
-      <h2>FAQ</h2>
-      <details>
-        <summary>How do I prepare my file?</summary>
-        <p>Ensure your model is manifold and exported as STL or OBJ.</p>
-      </details>
-      <details>
-        <summary>What if my print fails?</summary>
-        <p>We’ll contact you if there’s an issue.</p>
-      </details>
-      <details>
-        <summary>Can I request multiple copies?</summary>
-        <p>Yes; please specify quantity in the notes field.</p>
-      </details>
-    </section>
+  <!-- FAQ -->
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details>
+      <summary>How do I prepare my file?</summary>
+      <p>Ensure your model is manifold and exported as STL or OBJ.</p>
+    </details>
+    <details>
+      <summary>What if my print fails?</summary>
+      <p>We’ll contact you if there’s an issue.</p>
+    </details>
+    <details>
+      <summary>Can I request multiple copies?</summary>
+      <p>Yes; please specify quantity in the notes field.</p>
+    </details>
+  </section>
 
-    <!-- Contact -->
-    <section class="contact">
-      <h2>Contact &amp; Hours</h2>
-      <p>Email: <a href="mailto:3d@tadl.org">3d@tadl.org</a></p>
-      <p>Main Library, Mon–Fri 9 AM–5 PM</p>
-    </section>
-  </div>
-</body>
-</html>
+  <!-- Contact -->
+  <section class="contact">
+    <h2>Contact &amp; Hours</h2>
+    <p>Email: <a href="mailto:3d@tadl.org">3d@tadl.org</a></p>
+    <p>Main Library, Mon–Fri 9 AM–5 PM</p>
+  </section>
+</div>
