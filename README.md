@@ -1,24 +1,10 @@
-# README
+# TADL 3D Print Management System
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A Ruby on Rails application providing:
 
-Things you may want to cover:
+- A public 3D print request form  
+- Patron portal with magic-link authentication to view and manage print jobs  
+- Admin dashboard for librarians to review, queue, and track jobs  
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+> **Status:** Under heavy development!  
+> More documentation, setup instructions, and feature details are coming soon.  
