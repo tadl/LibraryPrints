@@ -38,6 +38,12 @@ class PrintJob < ApplicationRecord
   # Require _either_ a model_file _or_ a URL
   validate :url_or_model_file_present
 
+  # Returns the “pretty” name for the pickup_location code
+  def pickup_location_name
+    PickupLocation.find_by(code: pickup_location)&.name || pickup_location.humanize
+  end
+
+
   private
 
   def url_or_model_file_present

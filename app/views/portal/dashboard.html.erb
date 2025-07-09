@@ -22,7 +22,7 @@
       <% end %>
 
       <p><strong>Filament color:</strong> <%= job.filament_color %></p>
-      <p><strong>Pickup location:</strong> <%= job.pickup_location.humanize %></p>
+      <p><strong>Pickup location:</strong> <%= job.pickup_location_name %></p>
       <p><strong>Notes:</strong> <%= job.notes.presence || "—" %></p>
 
       <%= link_to "View details →",
