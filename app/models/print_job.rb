@@ -25,7 +25,12 @@ class PrintJob < ApplicationRecord
             allow_blank: true
 
   # Ensure pickup_location is always set
-  validates :pickup_location, presence: true
+  validates :pickup_location,
+            presence: true,
+            inclusion: {
+              in:  ->(_) { PickupLocation.active.pluck(:code) },
+              message: "%{value} is not a valid pickup location"
+            }
 
   # Filament color free-text (we’ll drive the list from the form/UI)
   validates :filament_color, length: { maximum: 50 }, allow_blank: true
