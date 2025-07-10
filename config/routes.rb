@@ -39,4 +39,5 @@ Rails.application.routes.draw do
 
   # You can uncomment / modify this if you add other top-level resources later
   # root "posts#index"
+
 end

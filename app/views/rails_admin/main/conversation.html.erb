@@ -1,0 +1,9 @@
+<div id="messages">
+  <%= render 'rails_admin/main/conversation_messages', conversation: @conversation %>
+</div>
+
+<div id="conversation_form">
+  <%= render 'rails_admin/main/conversation_form',
+             print_job:   @print_job,
+             conversation: @conversation %>
+</div>

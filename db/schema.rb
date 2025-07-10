@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_09_220317) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_10_172706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,12 +42,31 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_09_220317) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.bigint "print_job_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["print_job_id"], name: "index_conversations_on_print_job_id"
+  end
+
   create_table "filament_colors", force: :cascade do |t|
     t.string "name"
     t.string "code"
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.string "author_type", null: false
+    t.bigint "author_id", null: false
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "staff_note_only", default: false, null: false
+    t.index ["author_type", "author_id"], name: "index_messages_on_author"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
   end
 
   create_table "patrons", force: :cascade do |t|
@@ -68,6 +87,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_09_220317) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "active", default: true, null: false
+  end
+
+  create_table "print_job_notes", force: :cascade do |t|
+    t.bigint "print_job_id", null: false
+    t.text "content"
+    t.string "new_status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["print_job_id"], name: "index_print_job_notes_on_print_job_id"
   end
 
   create_table "print_jobs", force: :cascade do |t|
@@ -101,5 +129,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_09_220317) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "conversations", "print_jobs"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "print_job_notes", "print_jobs"
   add_foreign_key "print_jobs", "patrons"
 end

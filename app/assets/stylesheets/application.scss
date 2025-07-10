@@ -207,3 +207,45 @@ select {
   color: #666;
   margin-top: 0.25rem;
 }
+
+
+.rails_admin_conversation_messages {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 1em;
+  border: 1px solid #ddd;
+  margin-bottom: 1em;
+  background: #fafafa;
+}
+
+.message {
+  margin-bottom: 1em;
+  padding: 0.6em 1em;
+  border-radius: 4px;
+}
+
+.message.staff_user {
+  background-color: #e6f7ff;
+  text-align: right;
+}
+
+.message.patron {
+  background-color: #fff;
+  text-align: left;
+}
+
+.message-header {
+  font-size: 0.85em;
+  color: #555;
+  margin-bottom: 0.3em;
+}
+
+.message-body {
+  font-size: 1em;
+  color: #333;
+}
+
+.staff-note {
+  background-color: #f9f9f9;
+  border-left: 3px solid #999;
+}

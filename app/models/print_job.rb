@@ -2,6 +2,9 @@
 class PrintJob < ApplicationRecord
   belongs_to :patron
 
+  has_one :conversation, dependent: :destroy
+  after_create :build_conversation!
+
   # Active Storage attachment for the uploaded 3D model
   has_one_attached :model_file
 
@@ -50,5 +53,10 @@ class PrintJob < ApplicationRecord
     if url.blank? && !model_file.attached?
       errors.add(:base, "You must provide either a file upload or a URL")
     end
+  end
+
+  def build_conversation!
+    # only if you want an empty conversation to exist immediately
+    create_conversation! unless conversation
   end
 end
