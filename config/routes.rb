@@ -7,6 +7,10 @@ Rails.application.routes.draw do
 
   # Admin interface (RailsAdmin)
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+  match '/admin/print_job/:id/conversation',
+        to: 'rails_admin/main#conversation',
+        via: [:get, :post],
+        as: :print_job_conversation
 
   # Public home page
   root to: 'portal#home'
@@ -32,6 +36,8 @@ Rails.application.routes.draw do
   get '/dashboard', to: 'portal#dashboard', as: :dashboard
   # GET /jobs/:id?token=…   → details for a single print job
   get '/jobs/:id', to: 'portal#show', as: :job
+  # allow patrons to post a new message on their job
+  post '/jobs/:id/conversation', to: 'portal#create_message', as: :job_conversation
 
   # Health check endpoint for load-balancers / uptime monitors
   # Returns 200 OK if the app boots without errors, otherwise 500.

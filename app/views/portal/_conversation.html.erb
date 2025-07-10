@@ -1,0 +1,23 @@
+<div class="conversation">
+  <h2>Conversation</h2>
+
+  <div class="messages">
+    <%= render partial: 'rails_admin/main/message',
+               collection: (@print_job.conversation&.messages || []),
+               as: :message %>
+  </div>
+
+  <%= form_with url: job_conversation_path(@print_job),
+                scope: :message,
+                method: :post,
+                local: true do |f| %>
+    <%= hidden_field_tag :token, @patron.access_token %>
+    <div class="field">
+      <%= f.label :body, "Your message" %>
+      <%= f.text_area :body, rows: 3, class: 'form-control' %>
+    </div>
+    <div class="actions mt-2">
+      <%= f.submit "Send", class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+</div>

@@ -42,8 +42,8 @@ module RailsAdmin
               staff_only_flag = params.dig(:conversation, :staff_note_only) == '1'
 
               msg = @conversation.messages.create!(
-                body:       body,
-                author:     current_staff_user,
+                body:            body,
+                author:          current_staff_user,
                 staff_note_only: staff_only_flag
               )
 
@@ -52,7 +52,7 @@ module RailsAdmin
                 ::PrintJobMailer.with(message: msg).notify_patron.deliver_later
               end
 
-              # Turbo-stream replace the messages list
+              # Turbo-stream replace the messages list and reset the form
               render turbo_stream: [
                 turbo_stream.replace(
                   'messages',

@@ -1,5 +1,4 @@
-<div id="messages" class="rails_admin_conversation_messages">
-  <%= render partial: 'rails_admin/main/message',
-             collection: conversation.messages.order(:created_at),
-             as:         :message %>
-</div>
+<%# Just render the collection—no wrapping div with its own id %>
+<%= render partial: 'rails_admin/main/message',
+           collection: conversation.messages.order(:created_at),
+           as:         :message %>

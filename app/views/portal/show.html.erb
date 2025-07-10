@@ -1,36 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- … head & styles … -->
-</head>
-<body>
-  <%= render "shared/header" %>
+<%= render "shared/header" %>
 
-  <div class="content">
-    <h1>Print Request #<%= @print_job.id %></h1>
-    <p><strong>Status:</strong> <%= @print_job.status.humanize %></p>
-    <p><strong>Submitted:</strong> <%= @print_job.created_at.strftime("%b %-d, %Y %l:%M %p") %></p>
+<div class="content">
+  <h1>Print Request #<%= @print_job.id %></h1>
 
-    <% if @print_job.model_file.attached? %>
-      <p>
-        <strong>Model file:</strong>
-        <%= link_to @print_job.model_file.filename.to_s,
-                    rails_blob_path(@print_job.model_file, disposition: "attachment") %>
-      </p>
-    <% elsif @print_job.url.present? %>
-      <p>
-        <strong>Model URL:</strong>
-        <%= link_to @print_job.url, @print_job.url, target: "_blank", rel: "noopener" %>
-      </p>
-    <% end %>
+  <p><strong>Status:</strong> <%= @print_job.status.humanize %></p>
+  <p><strong>Submitted:</strong>
+    <%= @print_job.created_at.strftime("%b %-d, %Y %l:%M %p") %>
+  </p>
 
-    <p><strong>Filament color:</strong> <%= @print_job.filament_color %></p>
-    <p><strong>Pickup location:</strong> <%= @print_job.pickup_location_name %></p>
-    <p><strong>Notes:</strong> <%= @print_job.notes.presence || "—" %></p>
+  <% if @print_job.model_file.attached? %>
+    <p>
+      <strong>Model file:</strong>
+      <%= link_to @print_job.model_file.filename.to_s,
+                  rails_blob_path(@print_job.model_file, disposition: "attachment") %>
+    </p>
+  <% elsif @print_job.url.present? %>
+    <p>
+      <strong>Model URL:</strong>
+      <%= link_to @print_job.url,
+                  @print_job.url,
+                  target: "_blank",
+                  rel: "noopener" %>
+    </p>
+  <% end %>
 
+  <p><strong>Filament color:</strong> <%= @print_job.filament_color %></p>
+  <p><strong>Pickup location:</strong>
+    <%= @print_job.pickup_location_name %>
+  </p>
+  <p><strong>Notes:</strong>
+    <%= @print_job.notes.presence || "—" %>
+  </p>
+
+  <% if @print_job.conversation &&
+        @print_job.conversation.messages.where(staff_note_only: false).exists? %>
+    <h2>Messages</h2>
+    <div class="messages">
+      <%= render partial: "portal/message",
+                 collection: @print_job.conversation
+                                   .messages
+                                   .where(staff_note_only: false)
+                                   .order(:created_at),
+                 as: :message %>
+    </div>
+  <% end %>
+
+  <h3>Send us a message</h3>
+  <%= form_with url: job_conversation_path(@print_job, token: @patron.access_token),
+                scope: :message,
+                local: true do |f| %>
+    <div class="field">
+      <%= f.text_area :body,
+          placeholder: "Type your message…",
+          rows: 3,
+          class: "form-control" %>
+    </div>
+    <div class="actions mt-2">
+      <%= f.submit "Send", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+  <p class="mt-4">
     <%= link_to "← Back to Dashboard",
                 dashboard_path(token: @patron.access_token),
                 class: "view-link" %>
-  </div>
-</body>
-</html>
+  </p>
+</div>

@@ -1,0 +1,15 @@
+<!-- app/views/portal/_message.html.erb -->
+<div class="message <%= message.author_type.underscore %> <%= 'staff-note' if message.staff_note_only %>">
+  <div class="message-header">
+    <strong>
+      <%= message.author.name %>
+      (<%= message.author_type == 'StaffUser' ? 'staff' : 'patron' %>)
+    </strong>
+    <span class="timestamp">
+      <%= l(message.created_at, format: :short) %>
+    </span>
+  </div>
+  <div class="message-body">
+    <%= simple_format(message.body) %>
+  </div>
+</div>
