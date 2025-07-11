@@ -184,14 +184,19 @@ RailsAdmin.config do |config|
     end
 
     edit do
-      field :patron
+      field :patron do
+        inline_add   do bindings[:controller].current_staff_user.try(:admin?) end
+        inline_edit  do bindings[:controller].current_staff_user.try(:admin?) end
+      end
       field :status
       field :job_type, :enum do
+        required true
         enum do
           %w[Patron Staff Assistive\ Aid Fidget Scan].map { |v| [v, v] }
         end
       end
       field :print_type, :enum do
+        required true
         enum do
           %w[FDM Resin Scan].map { |v| [v, v] }
         end
@@ -204,6 +209,8 @@ RailsAdmin.config do |config|
       field :actual_cost
       field :completion_date, :date
       field :assigned_printer do
+        inline_add   do bindings[:controller].current_staff_user.try(:admin?) end
+        inline_edit  do bindings[:controller].current_staff_user.try(:admin?) end
         label 'Assigned Printer'
         associated_collection_scope do
           Proc.new { |scope|
