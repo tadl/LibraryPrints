@@ -47,6 +47,13 @@ module RailsAdmin
                 staff_note_only: staff_only_flag
               )
 
+              # attach any uploaded images
+              if params.dig(:conversation, :images).present?
+                Array(params.dig(:conversation, :images)).each do |upload|
+                  msg.images.attach(upload)
+                end
+              end
+
               # only email patron when not a staff-only note
               unless staff_only_flag
                 ::PrintJobMailer.with(message: msg).notify_patron.deliver_later

@@ -2,6 +2,7 @@
   <%= form_with url:    main_app.print_job_conversation_path(print_job),
                 scope:  :conversation,
                 method: :post,
+                multipart: true,
                 format: :turbo_stream,     # still needed so Rails knows to route .turbo_stream
                 local:  false,
                 data:   { turbo: true } do |f| %>
@@ -20,6 +21,11 @@
       <%= f.label :staff_note_only,
             t('rails_admin.conversation.staff_note_only'),
             class: 'form-check-label' %>
+    </div>
+
+    <div class="field">
+      <%= f.label :images, "Attach images" %>
+      <%= f.file_field :images, multiple: true, direct_upload: true %>
     </div>
 
     <div class="actions mt-2">
