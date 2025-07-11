@@ -16,6 +16,7 @@ RailsAdmin.config do |config|
     StaffUser
     Patron
     PrintJob
+    Printer
     FilamentColor
     PickupLocation
     Conversation
@@ -46,6 +47,50 @@ RailsAdmin.config do |config|
   end
 
   # ─ Models ─────────────────────────────────────────────
+
+  config.model 'Printer' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
+    navigation_label 'Admin'
+    weight           195
+    label             'Printer'
+    label_plural      'Printers'
+
+    list do
+      sort_by :name
+      field :id
+      field :name
+      field :printer_type
+      field :printer_model
+      field :bed_size
+      field :location
+    end
+
+    show do
+      field :id
+      field :name
+      field :printer_type
+      field :printer_model
+      field :bed_size
+      field :location
+      field :created_at
+      field :updated_at
+    end
+
+    edit do
+      field :name
+      field :printer_type, :enum do
+        enum { ['FDM', 'Resin', 'Scan'] }
+        help 'e.g. FDM, Resin, Scan'
+      end
+      field :printer_model
+      field :bed_size, :string do
+        help 'e.g. 200x200x200 mm'
+      end
+      field :location
+    end
+  end
 
   config.model 'StaffUser' do
     visible do
@@ -108,6 +153,9 @@ RailsAdmin.config do |config|
       field :id
       field :patron
       field :status
+      field :assigned_printer do
+        label 'Assigned Printer'
+      end
       field :pickup_location
       field :created_at
     end
@@ -116,6 +164,17 @@ RailsAdmin.config do |config|
       field :id
       field :patron
       field :status
+      field :job_type
+      field :print_type
+      field :print_time_estimate
+      field :slicer_weight
+      field :slicer_cost
+      field :actual_weight
+      field :actual_cost
+      field :completion_date
+      field :assigned_printer do
+        label 'Assigned Printer'
+      end
       field :description
       field :filament_color
       field :pickup_location
@@ -127,33 +186,52 @@ RailsAdmin.config do |config|
     edit do
       field :patron
       field :status
-      field :description
+      field :job_type, :enum do
+        enum do
+          %w[Patron Staff Assistive\ Aid Fidget Scan].map { |v| [v, v] }
+        end
+      end
+      field :print_type, :enum do
+        enum do
+          %w[FDM Resin Scan].map { |v| [v, v] }
+        end
+        default_value { 'FDM' }
+      end
+      field :print_time_estimate
+      field :slicer_weight
+      field :slicer_cost
+      field :actual_weight
+      field :actual_cost
+      field :completion_date, :date
+      field :assigned_printer do
+        label 'Assigned Printer'
+        associated_collection_scope do
+          Proc.new { |scope|
+            scope.order(:name)
+          }
+        end
+      end
 
       field :filament_color, :enum do
         label 'Filament Color'
         enum do
-          # [display_name, stored_value]
           FilamentColor.all.map { |c| [c.name, c.code] }
         end
-        # pre-select the existing value:
-        default_value do
-          bindings[:object].filament_color
-        end
+        default_value { bindings[:object].filament_color }
       end
 
       field :pickup_location, :enum do
         label 'Pickup Location'
         enum do
-          PickupLocation.where(active: true).map { |pl| [pl.name, pl.code] }
+          PickupLocation.where(active: true)
+                        .map { |pl| [pl.name, pl.code] }
         end
-        default_value do
-          bindings[:object].pickup_location
-        end
+        default_value { bindings[:object].pickup_location }
       end
 
       field :model_file, :active_storage
+      field :description, :text
     end
-
   end
 
   config.model 'FilamentColor' do

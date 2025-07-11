@@ -2,10 +2,12 @@
 class PrintJob < ApplicationRecord
   belongs_to :patron
 
+  belongs_to :assigned_printer,
+             class_name: 'Printer',
+             optional:   true
+
   has_one :conversation, dependent: :destroy
   after_create :build_conversation!
-
-  # Active Storage attachment for the uploaded 3D model
   has_one_attached :model_file
 
   # Status workflow
@@ -17,6 +19,12 @@ class PrintJob < ApplicationRecord
     ready_for_pickup:  4,
     archived:          5
   }
+
+  JOB_TYPES   = ['Patron', 'Staff', 'Assistive Aid', 'Fidget', 'Scan'].freeze
+  PRINT_TYPES = ['FDM', 'Resin', 'Scan'].freeze
+
+  validates :job_type,   inclusion: { in: JOB_TYPES },   allow_blank: true
+  validates :print_type, inclusion: { in: PRINT_TYPES }
 
   # Validations
   validates :status, presence: true
@@ -46,6 +54,10 @@ class PrintJob < ApplicationRecord
     PickupLocation.find_by(code: pickup_location)&.name || pickup_location.humanize
   end
 
+  def print_time_estimate_duration
+    return unless print_time_estimate
+    ActiveSupport::Duration.build(print_time_estimate.minutes)
+  end
 
   private
 

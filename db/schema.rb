@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_11_143605) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_11_160435) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -108,7 +108,28 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_143605) do
     t.string "url"
     t.string "filament_color"
     t.string "pickup_location"
+    t.string "job_type"
+    t.string "print_type", default: "FDM", null: false
+    t.integer "print_time_estimate"
+    t.decimal "slicer_weight", precision: 10, scale: 2
+    t.decimal "slicer_cost", precision: 10, scale: 2
+    t.decimal "actual_weight", precision: 10, scale: 2
+    t.decimal "actual_cost", precision: 10, scale: 2
+    t.date "completion_date"
+    t.bigint "assigned_printer_id"
+    t.index ["assigned_printer_id"], name: "index_print_jobs_on_assigned_printer_id"
     t.index ["patron_id"], name: "index_print_jobs_on_patron_id"
+  end
+
+  create_table "printers", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "printer_type"
+    t.string "printer_model"
+    t.string "bed_size"
+    t.string "location"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_printers_on_name", unique: true
   end
 
   create_table "staff_users", force: :cascade do |t|
@@ -134,4 +155,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_143605) do
   add_foreign_key "messages", "conversations"
   add_foreign_key "print_job_notes", "print_jobs"
   add_foreign_key "print_jobs", "patrons"
+  add_foreign_key "print_jobs", "printers", column: "assigned_printer_id"
 end
