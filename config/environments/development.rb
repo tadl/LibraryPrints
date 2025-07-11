@@ -83,4 +83,7 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.hosts << "aurora.lib.tadl.org:3000"
+  config.web_console.whitelisted_ips = '172.16.0.0/12'
 end

@@ -1,5 +1,5 @@
 # config/initializers/rails_admin.rb
-require Rails.root.join('lib/rails_admin/conversation')
+require Rails.root.join('lib/rails_admin/config/actions/conversation')
 
 RailsAdmin.config do |config|
   # ─ Authentication & inheritance ───────────────────────
@@ -9,13 +9,13 @@ RailsAdmin.config do |config|
   end
   config.current_user_method(&:current_staff_user)
 
+  config.asset_source = :sprockets
   # ─ App name & included models ────────────────────────
   config.main_app_name   = ['Library Prints','Admin']
   config.included_models = %w[
     StaffUser
     Patron
     PrintJob
-    PrintJobNote
     FilamentColor
     PickupLocation
     Conversation
@@ -37,32 +37,62 @@ RailsAdmin.config do |config|
       only ['PrintJob']
     end
 
-    delete
+    delete do
+      only ['Message','FilamentColor']
+      visible do
+        bindings[:controller].current_staff_user.admin?
+      end
+    end
   end
 
   # ─ Models ─────────────────────────────────────────────
 
   config.model 'StaffUser' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
     navigation_label 'Admin'
     weight           200
     label_plural     'Staff Users'
-    list   { field :id; field :email; field :name }
-    edit   { field :email; field :name }
+    list do
+      field :id
+      field :name
+      field :email
+      field :admin
+    end
+    edit do
+      field :name do
+        read_only true
+      end
+      field :email do
+        read_only true
+      end
+      field :admin
+    end
   end
 
   config.model 'Patron' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
     navigation_label 'Admin'
     weight           210
     label_plural     'Patrons'
   end
 
   config.model 'Conversation' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
     navigation_label 'Admin'
     weight           220
     label_plural     'Conversations'
   end
 
   config.model 'Message' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
     navigation_label 'Admin'
     weight           230
     label_plural     'Messages'
@@ -126,14 +156,10 @@ RailsAdmin.config do |config|
 
   end
 
-  config.model 'PrintJobNote' do
-    navigation_label 'Print Management'
-    weight           305
-    label_plural     'Print Job Notes'
-    # you can leave this blank if you never want to edit notes directly
-  end
-
   config.model 'FilamentColor' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
     navigation_label 'Form Options'
     weight           100
     label_plural     'Filament Colors'
@@ -147,6 +173,9 @@ RailsAdmin.config do |config|
   end
 
   config.model 'PickupLocation' do
+    visible do
+      bindings[:controller].current_staff_user.admin?
+    end
     navigation_label 'Form Options'
     weight           110
     label_plural     'Pickup Locations'

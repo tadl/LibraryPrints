@@ -13,4 +13,8 @@ class StaffUser < ApplicationRecord
     user.save! if user.changed?
     user
   end
+
+  def admin?
+    self.admin
+  end
 end
