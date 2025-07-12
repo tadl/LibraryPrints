@@ -1,38 +1,62 @@
 <%= render "shared/header" %>
+
 <div class="content">
   <h1>Your Print Jobs</h1>
 
-  <% @print_jobs.each do |job| %>
-    <div class="job">
-      <p><strong>Submitted:</strong> <%= job.created_at.to_formatted_s(:long) %></p>
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>Submitted</th>
+        <th>Model / Link</th>
+        <th>Color</th>
+        <th>Location</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @print_jobs.each do |job| %>
+        <tr>
+          <!-- Submitted -->
+          <td>
+            <%= job.created_at.strftime("%b %-d, %Y %l:%M %p") %>
+          </td>
 
-      <% if job.model_file.attached? %>
-        <p>
-          <strong>Model file:</strong>
-          <%= link_to job.model_file.filename.to_s,
-                      rails_blob_path(job.model_file, disposition: "attachment") %>
-        </p>
+          <!-- Model or URL -->
+          <td>
+            <% if job.model_file.attached? %>
+              <%= link_to job.model_file.filename.to_s,
+                          rails_blob_path(job.model_file, disposition: "attachment") %>
+            <% elsif job.url.present? %>
+              <%= link_to job.url, job.url,
+                          target: "_blank", rel: "noopener" %>
+            <% else %>
+              —
+            <% end %>
+          </td>
+
+          <!-- Color -->
+          <td>
+            <%= job.filament_color.presence || "—" %>
+          </td>
+
+          <!-- Location (and, if present, assigned printer) -->
+          <td>
+            <%= job.pickup_location_name %>
+            <% if job.respond_to?(:assigned_printer) && job.assigned_printer %>
+              <br>
+              <small>Printer: <%= job.assigned_printer.printer_model %></small>
+            <% end %>
+          </td>
+
+          <!-- Details link -->
+          <td>
+            <%= link_to "Details →",
+                        job_path(job, token: @patron.access_token),
+                        class: "view-link" %>
+          </td>
+        </tr>
       <% end %>
-
-      <% if job.url.present? %>
-        <p>
-          <strong>URL:</strong>
-          <%= link_to job.url, job.url, target: "_blank", rel: "noopener" %>
-        </p>
-      <% end %>
-
-      <p><strong>Filament color:</strong> <%= job.filament_color %></p>
-      <p><strong>Pickup location:</strong> <%= job.pickup_location_name %></p>
-      <p><strong>Notes:</strong> <%= job.notes.presence || "—" %></p>
-
-      <%= link_to "View details →",
-            url_for(
-              controller: 'portal',
-              action:     'show',
-              id:         job.id,
-              token:      @patron.access_token
-            ),
-            class: "view-link" %>
-    </div>
-  <% end %>
+    </tbody>
+  </table>
 </div>
+

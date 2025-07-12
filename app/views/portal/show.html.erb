@@ -1,6 +1,11 @@
 <%= render "shared/header" %>
 
 <div class="content">
+  <p class="mt-4">
+    <%= link_to "← Back to Dashboard",
+                dashboard_path(token: @patron.access_token),
+                class: "view-link" %>
+  </p>
   <h1>Print Request #<%= @print_job.id %></h1>
 
   <p><strong>Status:</strong> <%= @print_job.status.humanize %></p>
