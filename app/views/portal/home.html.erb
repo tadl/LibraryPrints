@@ -36,10 +36,15 @@
 
   <!-- Already have a request? -->
   <section class="my-5 text-center">
-    <h2>Already Have a Request?</h2>
-    <p>Log in to view and manage your existing print jobs.</p>
+    <h2>Have existing prints?</h2>
     <div class="cta">
-      <%= link_to 'Log In', login_path, class: 'btn btn-secondary btn-lg' %>
+      <% if cookies.encrypted[:patron_id] %>
+        <%= link_to 'Dashboard →', dashboard_path, class: 'btn btn-secondary' %>
+      <% else %>
+        <p>Log in to view and manage your existing print jobs.</p>
+        <%= link_to 'Log in', login_path, class: 'btn btn-secondary' %>
+      <% end %>
+
     </div>
   </section>
 </div>

@@ -3,7 +3,7 @@
 <div class="content">
   <p class="mt-4">
     <%= link_to "← Back to Dashboard",
-                dashboard_path(token: @patron.access_token),
+                dashboard_path,
                 class: "view-link" %>
   </p>
   <h1>Print Request #<%= @print_job.id %></h1>
@@ -67,7 +67,7 @@
 
   <p class="mt-4">
     <%= link_to "← Back to Dashboard",
-                dashboard_path(token: @patron.access_token),
+                dashboard_path,
                 class: "view-link" %>
   </p>
 </div>
