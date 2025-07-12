@@ -26,8 +26,8 @@ Rails.application.routes.draw do
   # Magic-link token requests
   # GET  /token_request     → show form where patron enters their email
   # POST /token_request     → send them a magic-link email
-  get  '/token_request', to: 'portal#token_request', as: :token_request
-  post '/token_request', to: 'portal#create_token_request'
+  get  '/login', to: 'portal#token_request', as: :login
+  post '/login', to: 'portal#send_token',   as: :send_login
   # Confirmation page after requesting a magic link
   get  '/token_thank_you', to: 'portal#token_thank_you', as: :token_thank_you
 

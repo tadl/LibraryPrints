@@ -86,5 +86,5 @@ Rails.application.configure do
 
   config.hosts << "aurora.lib.tadl.org:3000"
   config.hosts << /[a-z0-9\-]+\.ngrok-free\.app/
-  config.web_console.whitelisted_ips = '172.16.0.0/12'
+  config.web_console.whitelisted_ips = ['172.16.0.0/12', '192.168.99.0/24']
 end

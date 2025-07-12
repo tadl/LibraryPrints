@@ -55,7 +55,7 @@ class PortalController < ApplicationController
   end
 
   # Handle the email-submission for a magic-link request
-  def create_token_request
+  def send_token
     p = params.require(:patron).permit(:email)
     @patron = Patron.find_by(email: p[:email])
 

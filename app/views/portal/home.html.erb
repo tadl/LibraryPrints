@@ -2,9 +2,10 @@
 
 <div class="container">
   <h1>TADL 3D Print Management System</h1>
+
   <!-- Calls to action -->
   <div class="cta">
-    <%= link_to 'Submit a New Request', submit_job_path %>
+    <%= link_to 'Submit a New Request', submit_job_path, class: 'btn btn-primary' %>
   </div>
 
   <!-- Live queue stats -->
@@ -37,11 +38,11 @@
   </section>
 
   <section>
-    <h2>Already Submitted a Request?</h2>
-    <p>Lost your magic link? No problem—click the button below to have a new access link sent to your email so you can track and manage your print jobs.</p>
+    <h2>Already Have a Request?</h2>
+    <p>Log in to view and manage your existing print jobs.</p>
     <div class="cta">
-      <%= link_to 'Request New Access Link', token_request_path %>
+      <%= link_to 'Log in', login_path, class: 'btn btn-secondary' %>
     </div>
   </section>
-
 </div>
+

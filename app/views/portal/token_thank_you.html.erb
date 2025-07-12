@@ -1,6 +1,19 @@
 <%= render 'shared/header' %>
 
-<div class="content">
-  <h1>Check Your Inbox</h1>
-  <p>We’ve sent you an email with a secure link to view your 3D print jobs. Please check your inbox (and spam folder).</p>
+<div class="container py-5 d-flex justify-content-center">
+  <div class="card shadow-sm w-100 w-md-50">
+    <div class="card-body text-center">
+      <i class="fa fa-envelope fa-3x mb-3 text-primary"></i>
+      <h1 class="h3 mb-3">Check Your Inbox</h1>
+      <p class="mb-4">
+        We’ve sent you an email with a secure login link to manage your 3D print jobs.
+        Please check your inbox—and if you don’t see it, your spam folder.
+      </p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <%= link_to 'Resend Login Link', login_path, class: 'btn btn-outline-primary me-sm-2' %>
+        <%= link_to 'Submit New Request', submit_job_path, class: 'btn btn-primary' %>
+      </div>
+    </div>
+  </div>
 </div>
+
