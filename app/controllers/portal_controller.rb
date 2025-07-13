@@ -4,7 +4,7 @@ class PortalController < ApplicationController
 
   # these need a logged-in patron
   before_action :load_patron, only: %i[dashboard show create_message]
-  before_action :load_print_job, only: %i[show create_message]
+  before_action :load_job,    only: %i[show create_message]
 
   # Public landing page
   def home
@@ -12,30 +12,36 @@ class PortalController < ApplicationController
 
   # Show the “Submit a New Request” form
   def submit
-    @print_job = PrintJob.new
+    @job = PrintJob.new
   end
 
   # Handle submission of a new 3D print job
   def create_job
+    # find or create the Patron
     p_params = params.require(:patron).permit(:first_name, :last_name, :email)
-    @patron = Patron.find_or_initialize_by(email: p_params[:email])
+    @patron   = Patron.find_or_initialize_by(email: p_params[:email])
     if @patron.new_record?
       @patron.name = "#{p_params[:first_name]} #{p_params[:last_name]}"
       @patron.save!
     end
 
+    # regenerate token & send magic-link
     @patron.regenerate_access_token!
     PatronMailer.access_link(@patron).deliver_later
 
-    job_params = params.require(:print_job)
+    # build a plain Job record, force it to be a PrintJob STI
+    job_params = params.require(:job)
                      .permit(:model_file, :url, :filament_color, :notes, :pickup_location)
-    @print_job        = @patron.print_jobs.build(job_params)
-    @print_job.status = 'pending'
 
-    if @print_job.save
+    @job           = @patron.jobs.build(job_params)
+    @job.type      = 'PrintJob'    # STI discriminator
+    @job.category  = 'Patron'      # if you're still using that column
+    @job.status    = 'pending'     # always pending to start
+
+    if @job.save
       redirect_to thank_you_path
     else
-      flash.now[:alert] = @print_job.errors.full_messages.to_sentence
+      flash.now[:alert] = @job.errors.full_messages.to_sentence
       render :submit, status: :unprocessable_entity
     end
   end
@@ -50,8 +56,9 @@ class PortalController < ApplicationController
 
   # Send the magic link, and set a secure cookie
   def send_token
-    p_params = params.require(:patron).permit(:email)
-    @patron  = Patron.find_by(email: p_params[:email])
+    patron_params = params.require(:patron).permit(:email)
+    @patron = Patron.find_by(email: patron_params[:email])
+
     unless @patron
       flash.now[:alert] = "We couldn't find that email address."
       return render :token_request, status: :unprocessable_entity
@@ -78,12 +85,12 @@ class PortalController < ApplicationController
 
   # Patron dashboard (list of their jobs)
   def dashboard
-    @print_jobs = @patron.print_jobs.order(created_at: :desc)
+    @jobs = @patron.jobs.order(created_at: :desc)
   end
 
   # Show a single job (and its visible messages)
   def show
-    @messages   = @print_job.conversation&.messages
+    @messages    = @job.conversation&.messages
                       &.where(staff_note_only: false)
                       &.order(:created_at) || []
     @new_message = Message.new
@@ -91,7 +98,7 @@ class PortalController < ApplicationController
 
   # Handle a patron posting a message to the conversation
   def create_message
-    @conversation = @print_job.conversation || @print_job.build_conversation
+    @conversation = @job.conversation || @job.build_conversation
     @conversation.save if @conversation.new_record?
 
     @conversation.messages.create!(
@@ -99,14 +106,14 @@ class PortalController < ApplicationController
       author: @patron
     )
 
-    redirect_to job_path(@print_job), notice: 'Your message has been sent.'
+    redirect_to job_path(@job), notice: 'Your message has been sent.'
   end
 
   private
 
-  # Load/validate a patron: first via the cookie, else via token in URL/session
+  # Load/validate a patron: first via the secure cookie, else via token in URL/session
   def load_patron
-    if cookies.encrypted[:patron_id]
+    if cookies.encrypted[:patron_id].present?
       @patron = Patron.find_by(id: cookies.encrypted[:patron_id])
       head :unauthorized and return unless @patron&.token_valid?
     else
@@ -120,9 +127,8 @@ class PortalController < ApplicationController
     end
   end
 
-  # Scoped load of this user’s print job
-  def load_print_job
-    @print_job = @patron.print_jobs.find(params[:id])
+  # Scoped load of this user’s job (PrintJob or ScanJob via STI)
+  def load_job
+    @job = @patron.jobs.find(params[:id])
   end
 end
-

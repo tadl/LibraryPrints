@@ -13,7 +13,7 @@ module RailsAdmin
         end
 
         register_instance_option :visible? do
-          bindings[:abstract_model].model == ::PrintJob && authorized?
+          bindings[:abstract_model].model == ::Job && authorized?
         end
 
         register_instance_option :link_icon do
@@ -34,8 +34,8 @@ module RailsAdmin
 
         register_instance_option :controller do
           proc do
-            @print_job    = @abstract_model.model.find(params[:id])
-            @conversation = @print_job.conversation || @print_job.build_conversation
+            @job          = @abstract_model.model.find(params[:id])
+            @conversation = @job.conversation || @job.build_conversation
 
             if request.post?
               body            = params.dig(:conversation, :message_body)
@@ -56,7 +56,7 @@ module RailsAdmin
 
               # only email patron when not a staff-only note
               unless staff_only_flag
-                ::PrintJobMailer.with(message: msg).notify_patron.deliver_later
+                JobMailer.with(message: msg).notify_patron.deliver_later
               end
 
               # Turbo-stream replace the messages list and reset the form
@@ -69,7 +69,7 @@ module RailsAdmin
                 turbo_stream.replace(
                   'conversation_form',
                   partial: 'rails_admin/main/conversation_form',
-                  locals: { print_job:   @print_job,
+                  locals: { job:          @job,
                             conversation: @conversation }
                 )
               ]

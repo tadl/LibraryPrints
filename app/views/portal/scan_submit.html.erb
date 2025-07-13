@@ -1,0 +1,22 @@
+<%= render 'shared/header' %>
+
+<div class="content">
+  <h1>Request a 3D Scan</h1>
+
+  <%= form_with url: create_scan_job_path, local: true, multipart: true do |f| %>
+    <div class="field">
+      <%= f.label :model_description, "What do you need scanned?" %><br>
+      <%= f.text_area :description, rows: 4, class: "form-control" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :scan_photos, "Attach Reference Photos (optional)" %><br>
+      <%= f.file_field :scan_photos, multiple: true, accept: 'image/*', class: "form-control" %>
+    </div>
+
+    <div class="actions mt-3">
+      <%= f.submit "Submit Scan Request", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
+

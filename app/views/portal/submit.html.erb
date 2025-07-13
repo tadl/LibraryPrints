@@ -1,63 +1,70 @@
 <%= render 'shared/header' %>
 
-<main>
+<main class="submit-job-page">
   <h1>3D Print Request Form</h1>
+
+  <% if flash[:alert].present? %>
+    <div class="alert alert-danger">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
   <%= form_tag submit_job_path, multipart: true, local: true do %>
     <fieldset>
       <legend>Name</legend>
       <label for="patron_first_name">First Name</label>
-      <%= text_field_tag 'patron[first_name]', nil, id: 'patron_first_name', required: true %>
+      <%= text_field_tag 'patron[first_name]', params.dig(:patron, :first_name), id: 'patron_first_name', required: true %>
 
       <label for="patron_last_name">Last Name</label>
-      <%= text_field_tag 'patron[last_name]', nil, id: 'patron_last_name', required: true %>
+      <%= text_field_tag 'patron[last_name]', params.dig(:patron, :last_name), id: 'patron_last_name', required: true %>
 
       <label for="patron_email">Email Address</label>
-      <%= email_field_tag 'patron[email]', nil, id: 'patron_email', required: true %>
+      <%= email_field_tag 'patron[email]', params.dig(:patron, :email), id: 'patron_email', required: true %>
     </fieldset>
 
     <fieldset>
       <legend>Model File</legend>
-      <label for="print_job_model_file">Choose File</label>
-      <%= file_field_tag 'print_job[model_file]', accept: '.stl,.obj', id: 'print_job_model_file' %>
+      <label for="job_model_file">Choose File</label>
+      <%= file_field_tag 'job[model_file]', accept: '.stl,.obj', id: 'job_model_file' %>
       <p class="help-text">
-        Allowed types: stl, obj.
+        Allowed types: STL, OBJ.
       </p>
     </fieldset>
 
     <fieldset>
       <legend>URL</legend>
-      <label for="print_job_url">URL to model</label>
-      <%= url_field_tag 'print_job[url]', nil, id: 'print_job_url' %>
+      <label for="job_url">URL to model</label>
+      <%= url_field_tag 'job[url]', @job&.url, id: 'job_url' %>
     </fieldset>
 
     <fieldset>
       <legend>Filament Color Preference</legend>
-      <label for="print_job_filament_color">Choose a color</label>
-      <%= select_tag 'print_job[filament_color]',
+      <label for="job_filament_color">Choose a color</label>
+      <%= select_tag 'job[filament_color]',
             options_from_collection_for_select(
-              FilamentColor.all, :code, :name, selected: @print_job.filament_color
+              FilamentColor.all.order(:position), :code, :name, @job&.filament_color
             ),
             include_blank: 'Select color',
-            id: 'print_job_filament_color' %>
+            id: 'job_filament_color' %>
     </fieldset>
 
     <fieldset>
       <legend>Notes</legend>
-      <label for="print_job_notes">Additional instructions</label>
-      <%= text_area_tag 'print_job[notes]', nil,
-            id: 'print_job_notes', rows: 4,
+      <label for="job_notes">Additional instructions</label>
+      <%= text_area_tag 'job[notes]', @job&.notes, id: 'job_notes',
+            rows: 4,
             placeholder: 'Add any special instructions or context' %>
     </fieldset>
 
     <fieldset>
       <legend>Pickup Location</legend>
-      <label for="print_job_pickup_location">Select Location</label>
-      <%= select_tag 'print_job[pickup_location]',
+      <label for="job_pickup_location">Select Location</label>
+      <%= select_tag 'job[pickup_location]',
             options_for_select(
               PickupLocation.active.order(:position).pluck(:name, :code),
-              'wood'
+              @job&.pickup_location || 'wood'
             ),
-            id: 'print_job_pickup_location' %>
+            id: 'job_pickup_location' %>
       <p class="help-text">
         Choose where you’ll pick up your print.
       </p>
@@ -70,6 +77,6 @@
       <%= text_field_tag 'captcha', nil, id: 'captcha_field', required: true %>
     </fieldset>
 
-    <%= submit_tag 'Submit Print Job', class: 'submit-button' %>
+    <%= submit_tag 'Submit Job', class: 'submit-button' %>
   <% end %>
 </main>

@@ -2,66 +2,58 @@
 
 <div class="content">
   <p class="mt-4">
-    <%= link_to "← Home",
-                root_path,
-                class: "view-link" %>
+    <%= link_to "← Home", root_path, class: "view-link" %>
   </p>
-  <h1>Your Print Jobs</h1>
+  <h1>Your Jobs</h1>
 
-  <table class="jobs-table">
-    <thead>
-      <tr>
-        <th>Submitted</th>
-        <th>Model / Link</th>
-        <th>Color</th>
-        <th>Location</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @print_jobs.each do |job| %>
+  <% if @jobs.any? %>
+    <table class="jobs-table">
+      <thead>
         <tr>
-          <!-- Submitted -->
-          <td>
-            <%= job.created_at.strftime("%b %-d, %Y %l:%M %p") %>
-          </td>
-
-          <!-- Model or URL -->
-          <td>
-            <% if job.model_file.attached? %>
-              <%= link_to job.model_file.filename.to_s,
-                          rails_blob_path(job.model_file, disposition: "attachment") %>
-            <% elsif job.url.present? %>
-              <%= link_to job.url, job.url,
-                          target: "_blank", rel: "noopener" %>
-            <% else %>
-              —
-            <% end %>
-          </td>
-
-          <!-- Color -->
-          <td>
-            <%= job.filament_color.presence || "—" %>
-          </td>
-
-          <!-- Location (and, if present, assigned printer) -->
-          <td>
-            <%= job.pickup_location_name %>
-            <% if job.respond_to?(:assigned_printer) && job.assigned_printer %>
-              <br>
-              <small>Printer: <%= job.assigned_printer.printer_model %></small>
-            <% end %>
-          </td>
-
-          <!-- Details link -->
-          <td>
-            <%= link_to "Details →",
-                        job_path(job),
-                        class: "view-link" %>
-          </td>
+          <th>Submitted</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Location</th>
+          <th></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody>
+        <% @jobs.each do |job| %>
+          <tr>
+            <!-- Submitted date -->
+            <td>
+              <%= job.created_at.strftime("%b %-d, %Y %l:%M %p") %>
+            </td>
 
+            <!-- Print vs Scan -->
+            <td>
+              <%= job.type.demodulize.delete_suffix("Job") %>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <%= job.status.humanize %>
+            </td>
+
+            <!-- Pickup location + assigned printer model (prints only) -->
+            <td>
+              <%# if the model has a pickup_location_name method %>
+              <%= job.pickup_location_name if job.respond_to?(:pickup_location_name) %>
+              <% if job.respond_to?(:assigned_printer) && job.assigned_printer %>
+                <br>
+                <small>Printer: <%= job.assigned_printer.printer_model %></small>
+              <% end %>
+            </td>
+
+            <!-- Details link -->
+            <td>
+              <%= link_to "Details →", job_path(job), class: "view-link" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>You have no jobs yet. <%= link_to "Submit one now", submit_job_path %>.</p>
+  <% end %>
+</div>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    /* inline styles if you like */
+  </style>
+</head>
+<body>
+  <p>Hello <%= @job.patron.name %>,</p>
+
+  <p>You’ve got a new message about your <%= @job.is_a?(PrintJob) ? "print" : "scan" %> job #<%= @job.id %>:</p>
+
+  <blockquote>
+    <%= simple_format(@message.body) %>
+  </blockquote>
+
+  <p>
+    You can reply or view the full conversation here:<br>
+    <a href="<%= rails_admin.show_path(model_name: 'job', id: @job.id) %>">
+      View conversation in the admin
+    </a>
+  </p>
+
+  <p>— Your TADL Makerspace</p>
+</body>
+</html>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_11_160435) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_13_015928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -43,10 +43,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_160435) do
   end
 
   create_table "conversations", force: :cascade do |t|
-    t.bigint "print_job_id", null: false
+    t.bigint "job_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["print_job_id"], name: "index_conversations_on_print_job_id"
+    t.index ["job_id"], name: "index_conversations_on_job_id"
   end
 
   create_table "filament_colors", force: :cascade do |t|
@@ -55,6 +55,31 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_160435) do
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "jobs", force: :cascade do |t|
+    t.bigint "patron_id", null: false
+    t.integer "status"
+    t.text "description"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.string "filament_color"
+    t.string "pickup_location"
+    t.string "category"
+    t.string "print_type", default: "FDM", null: false
+    t.integer "print_time_estimate"
+    t.decimal "slicer_weight", precision: 10, scale: 2
+    t.decimal "slicer_cost", precision: 10, scale: 2
+    t.decimal "actual_weight", precision: 10, scale: 2
+    t.decimal "actual_cost", precision: 10, scale: 2
+    t.date "completion_date"
+    t.bigint "assigned_printer_id"
+    t.boolean "spray_ok", default: false, null: false, comment: "Whether it’s OK to apply scanning spray/powder to the object"
+    t.string "type", default: "PrintJob", null: false
+    t.index ["assigned_printer_id"], name: "index_jobs_on_assigned_printer_id"
+    t.index ["patron_id"], name: "index_jobs_on_patron_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -98,29 +123,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_160435) do
     t.index ["print_job_id"], name: "index_print_job_notes_on_print_job_id"
   end
 
-  create_table "print_jobs", force: :cascade do |t|
-    t.bigint "patron_id", null: false
-    t.integer "status"
-    t.text "description"
-    t.text "notes"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "url"
-    t.string "filament_color"
-    t.string "pickup_location"
-    t.string "job_type"
-    t.string "print_type", default: "FDM", null: false
-    t.integer "print_time_estimate"
-    t.decimal "slicer_weight", precision: 10, scale: 2
-    t.decimal "slicer_cost", precision: 10, scale: 2
-    t.decimal "actual_weight", precision: 10, scale: 2
-    t.decimal "actual_cost", precision: 10, scale: 2
-    t.date "completion_date"
-    t.bigint "assigned_printer_id"
-    t.index ["assigned_printer_id"], name: "index_print_jobs_on_assigned_printer_id"
-    t.index ["patron_id"], name: "index_print_jobs_on_patron_id"
-  end
-
   create_table "printers", force: :cascade do |t|
     t.string "name", null: false
     t.string "printer_type"
@@ -151,9 +153,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_160435) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "conversations", "print_jobs"
+  add_foreign_key "conversations", "jobs"
+  add_foreign_key "conversations", "jobs"
+  add_foreign_key "jobs", "patrons"
+  add_foreign_key "jobs", "printers", column: "assigned_printer_id"
   add_foreign_key "messages", "conversations"
-  add_foreign_key "print_job_notes", "print_jobs"
-  add_foreign_key "print_jobs", "patrons"
-  add_foreign_key "print_jobs", "printers", column: "assigned_printer_id"
+  add_foreign_key "print_job_notes", "jobs", column: "print_job_id"
 end

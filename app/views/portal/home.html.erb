@@ -10,19 +10,19 @@
 
   <!-- Live queue stats -->
   <section class="my-5">
-    <h2>3D Printing Stats</h2>
+    <h2>Queue Stats</h2>
     <div class="stats d-flex justify-content-between flex-wrap">
       <div class="stat text-center p-3">
-        <strong><%= PrintJob.pending.count %></strong><br/>Pending
+        <strong><%= Job.pending.count %></strong><br/>Pending
       </div>
       <div class="stat text-center p-3">
-        <strong><%= PrintJob.queued.count %></strong><br/>Queued
+        <strong><%= Job.queued.count %></strong><br/>Queued
       </div>
       <div class="stat text-center p-3">
-        <strong><%= PrintJob.printing.count %></strong><br/>Printing
+        <strong><%= Job.printing.count %></strong><br/>Printing
       </div>
       <div class="stat text-center p-3">
-        <strong><%= PrintJob.ready_for_pickup.count %></strong><br/>Ready
+        <strong><%= Job.ready_for_pickup.count %></strong><br/>Ready
       </div>
     </div>
   </section>

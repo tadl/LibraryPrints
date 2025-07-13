@@ -10,12 +10,13 @@ RailsAdmin.config do |config|
   config.current_user_method(&:current_staff_user)
 
   config.asset_source = :sprockets
+
   # ─ App name & included models ────────────────────────
   config.main_app_name   = ['Library Prints','Admin']
   config.included_models = %w[
     StaffUser
     Patron
-    PrintJob
+    Job
     Printer
     FilamentColor
     PickupLocation
@@ -33,9 +34,9 @@ RailsAdmin.config do |config|
     show
     edit
 
-    # <–– your custom Conversation button ––>
+    # custom Conversation button on Jobs
     conversation do
-      only ['PrintJob']
+      only ['Job']
     end
 
     delete do
@@ -46,38 +47,25 @@ RailsAdmin.config do |config|
     end
   end
 
-  # ─ Models ─────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────
+  # Printer, StaffUser, Patron, Conversation, Message
+  # (all left unchanged)…
+  # ──────────────────────────────────────────────────────
 
   config.model 'Printer' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Admin'
     weight           195
     label             'Printer'
     label_plural      'Printers'
-
     list do
       sort_by :name
-      field :id
-      field :name
-      field :printer_type
-      field :printer_model
-      field :bed_size
-      field :location
+      field :id; field :name; field :printer_type; field :printer_model; field :bed_size; field :location
     end
-
     show do
-      field :id
-      field :name
-      field :printer_type
-      field :printer_model
-      field :bed_size
-      field :location
-      field :created_at
-      field :updated_at
+      field :id; field :name; field :printer_type; field :printer_model; field :bed_size; field :location
+      field :created_at; field :updated_at
     end
-
     edit do
       field :name
       field :printer_type, :enum do
@@ -93,70 +81,60 @@ RailsAdmin.config do |config|
   end
 
   config.model 'StaffUser' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Admin'
     weight           200
     label_plural     'Staff Users'
     list do
-      field :id
-      field :name
-      field :email
-      field :admin
+      field :id; field :name; field :email; field :admin
     end
     edit do
-      field :name do
-        read_only true
-      end
-      field :email do
-        read_only true
-      end
+      field(:name)  { read_only true }
+      field(:email) { read_only true }
       field :admin
     end
   end
 
   config.model 'Patron' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Admin'
     weight           210
     label_plural     'Patrons'
   end
 
   config.model 'Conversation' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Admin'
     weight           220
     label_plural     'Conversations'
   end
 
   config.model 'Message' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Admin'
     weight           230
     label_plural     'Messages'
   end
 
-  config.model 'PrintJob' do
-    navigation_label 'Print Management'
+  # ─ Job (formerly PrintJob) ────────────────────────────
+  config.model 'Job' do
+    navigation_label 'Management'
     weight           300
-    label_plural     'Print Jobs'
+    label_plural     'Jobs'
 
     list do
       sort_by :created_at
       field :id
       field :patron
       field :status
+      field :category do
+        label 'Category'
+      end
+      field :print_type
+      field :pickup_location
       field :assigned_printer do
         label 'Assigned Printer'
       end
-      field :pickup_location
       field :created_at
     end
 
@@ -164,37 +142,127 @@ RailsAdmin.config do |config|
       field :id
       field :patron
       field :status
-      field :job_type
-      field :print_type
-      field :print_time_estimate
-      field :slicer_weight
-      field :slicer_cost
-      field :actual_weight
-      field :actual_cost
-      field :completion_date
-      field :assigned_printer do
-        label 'Assigned Printer'
+      field :category do
+        label 'Category'
       end
-      field :description
-      field :filament_color
+      field :type do
+        label 'Job Type'
+      end
+
+      ## Print-only fields
+      field :model_file, :active_storage do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :url do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :filament_color do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :print_time_estimate do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :slicer_weight do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :slicer_cost do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :actual_weight do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :actual_cost do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :completion_date, :date do
+        visible { bindings[:object].is_a?(PrintJob) }
+      end
+      field :assigned_printer, :belongs_to_association do
+        label    'Assigned Printer'
+        visible  { bindings[:object].is_a?(PrintJob) }
+      end
+
+      ## Scan-only fields
+      field :scan_images, :active_storage do
+        visible { bindings[:object].is_a?(ScanJob) }
+      end
+      field :spray_ok do
+        label   'Spray OK?'
+        visible { bindings[:object].is_a?(ScanJob) }
+      end
+      field :notes do
+        visible { bindings[:object].is_a?(ScanJob) }
+      end
+
+      ## Shared
       field :pickup_location
-      field :model_file, :active_storage
+      field :description
       field :created_at
       field :updated_at
     end
 
     edit do
       field :patron do
-        inline_add   do bindings[:controller].current_staff_user.try(:admin?) end
-        inline_edit  do bindings[:controller].current_staff_user.try(:admin?) end
+        inline_add   { bindings[:controller].current_staff_user.admin? }
+        inline_edit  { bindings[:controller].current_staff_user.admin? }
       end
+
       field :status
-      field :job_type, :enum do
+
+      field :category, :enum do
+        label    'Category'
         required true
         enum do
           %w[Patron Staff Assistive\ Aid Fidget Scan].map { |v| [v, v] }
         end
+        default_value { bindings[:object].category || 'Patron' }
       end
+
+      field :type, :enum do
+        label 'Job Type'
+        enum { [['Print', 'PrintJob'], ['Scan', 'ScanJob']] }
+        default_value { bindings[:object].type || 'PrintJob' }
+      end
+
+      group :print_fields do
+        label   'Print-only fields'
+        visible { bindings[:object].is_a?(PrintJob) }
+        field :model_file, :active_storage
+        field :url
+        field :filament_color
+        field :print_time_estimate
+        field :slicer_weight
+        field :slicer_cost
+        field :actual_weight
+        field :actual_cost
+        field :completion_date, :date
+        field :pickup_location, :enum do
+          enum do
+            PickupLocation.active.map { |pl| [pl.name, pl.code] }
+          end
+        end
+        field :assigned_printer, :belongs_to_association do
+          label 'Assigned Printer'
+          inline_add   { bindings[:controller].current_staff_user.admin? }
+          inline_edit  { bindings[:controller].current_staff_user.admin? }
+          associated_collection_scope { Proc.new { |scope| scope.order(:name) } }
+          visible { bindings[:object].is_a?(PrintJob) }
+        end
+      end
+
+      group :scan_fields do
+        label   'Scan-only fields'
+        visible { bindings[:object].is_a?(ScanJob) }
+        field :scan_images, :active_storage
+        field :spray_ok
+        field :notes
+        field :pickup_location, :enum do
+          enum do
+            PickupLocation.active.map { |pl| [pl.name, pl.code] }
+          end
+        end
+      end
+
       field :print_type, :enum do
         required true
         enum do
@@ -202,55 +270,19 @@ RailsAdmin.config do |config|
         end
         default_value { 'FDM' }
       end
-      field :print_time_estimate
-      field :slicer_weight
-      field :slicer_cost
-      field :actual_weight
-      field :actual_cost
-      field :completion_date, :date
-      field :assigned_printer do
-        inline_add   do bindings[:controller].current_staff_user.try(:admin?) end
-        inline_edit  do bindings[:controller].current_staff_user.try(:admin?) end
-        label 'Assigned Printer'
-        associated_collection_scope do
-          Proc.new { |scope|
-            scope.order(:name)
-          }
-        end
-      end
 
-      field :filament_color, :enum do
-        label 'Filament Color'
-        enum do
-          FilamentColor.all.map { |c| [c.name, c.code] }
-        end
-        default_value { bindings[:object].filament_color }
-      end
-
-      field :pickup_location, :enum do
-        label 'Pickup Location'
-        enum do
-          PickupLocation.where(active: true)
-                        .map { |pl| [pl.name, pl.code] }
-        end
-        default_value { bindings[:object].pickup_location }
-      end
-
-      field :model_file, :active_storage
       field :description, :text
     end
   end
 
+  # ─ FilamentColor & PickupLocation (unchanged) ─────────
   config.model 'FilamentColor' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Form Options'
     weight           100
     label_plural     'Filament Colors'
     list do
-      sort_by :name
-      field :name; field :code
+      sort_by :name; field :name; field :code
     end
     edit do
       field :name; field :code
@@ -258,15 +290,12 @@ RailsAdmin.config do |config|
   end
 
   config.model 'PickupLocation' do
-    visible do
-      bindings[:controller].current_staff_user.admin?
-    end
+    visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Form Options'
     weight           110
     label_plural     'Pickup Locations'
     list do
-      sort_by :name
-      field :name; field :code; field :active
+      sort_by :name; field :name; field :code; field :active
     end
     edit do
       field :name; field :code; field :active

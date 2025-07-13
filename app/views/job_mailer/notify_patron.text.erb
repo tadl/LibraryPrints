@@ -1,0 +1,12 @@
+Hello <%= @job.patron.name %>,
+
+You’ve got a new message about your <%= @job.is_a?(PrintJob) ? "print" : "scan" %> job ##<%= @job.id %>:
+
+--------------------------------------------------
+<%= @message.body %>
+--------------------------------------------------
+
+You can reply or view the full conversation here:
+<%= rails_admin.show_url(model_name: 'job', id: @job.id) %>
+
+— Your TADL Makerspace

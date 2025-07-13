@@ -1,7 +1,0 @@
-<p>Hello <%= @print_job.patron.name %>,</p>
-
-<p>You’ve got a new message about your print job ##<%= @print_job.id %>:</p>
-<blockquote><%= @message.body %></blockquote>
-
-<p><%= link_to "View your print job",
-      job_url(@print_job, token: @print_job.patron.access_token) %></p>
