@@ -4,12 +4,11 @@
   <h1>3D Print Request Form</h1>
 
   <% if flash[:alert].present? %>
-    <div class="alert alert-danger">
-      <%= flash[:alert] %>
-    </div>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
   <% end %>
 
-  <%= form_tag submit_job_path, multipart: true, local: true do %>
+  <%= form_tag submit_print_path, multipart: true, local: true do %>
+
     <fieldset>
       <legend>Name</legend>
       <label for="patron_first_name">First Name</label>
@@ -26,23 +25,22 @@
       <legend>Model File</legend>
       <label for="job_model_file">Choose File</label>
       <%= file_field_tag 'job[model_file]', accept: '.stl,.obj', id: 'job_model_file' %>
-      <p class="help-text">
-        Allowed types: STL, OBJ.
-      </p>
+      <p class="help-text">Allowed types: STL, OBJ.</p>
     </fieldset>
 
     <fieldset>
-      <legend>URL</legend>
-      <label for="job_url">URL to model</label>
-      <%= url_field_tag 'job[url]', @job&.url, id: 'job_url' %>
+      <legend>Or, URL to model</legend>
+      <label for="job_url">Model URL</label>
+      <%= url_field_tag 'job[url]', params.dig(:job, :url), id: 'job_url' %>
     </fieldset>
 
     <fieldset>
-      <legend>Filament Color Preference</legend>
+      <legend>Filament Color</legend>
       <label for="job_filament_color">Choose a color</label>
       <%= select_tag 'job[filament_color]',
             options_from_collection_for_select(
-              FilamentColor.all.order(:position), :code, :name, @job&.filament_color
+              FilamentColor.all.order(:position), :code, :name,
+              params.dig(:job, :filament_color)
             ),
             include_blank: 'Select color',
             id: 'job_filament_color' %>
@@ -51,32 +49,29 @@
     <fieldset>
       <legend>Notes</legend>
       <label for="job_notes">Additional instructions</label>
-      <%= text_area_tag 'job[notes]', @job&.notes, id: 'job_notes',
-            rows: 4,
-            placeholder: 'Add any special instructions or context' %>
+      <%= text_area_tag 'job[notes]', params.dig(:job, :notes),
+            id: 'job_notes', rows: 4,
+            placeholder: 'Any special instructions…' %>
     </fieldset>
 
     <fieldset>
       <legend>Pickup Location</legend>
-      <label for="job_pickup_location">Select Location</label>
+      <label for="job_pickup_location">Where will you pick up?</label>
       <%= select_tag 'job[pickup_location]',
             options_for_select(
               PickupLocation.active.order(:position).pluck(:name, :code),
-              @job&.pickup_location || 'wood'
+              params.dig(:job, :pickup_location) || 'wood'
             ),
             id: 'job_pickup_location' %>
-      <p class="help-text">
-        Choose where you’ll pick up your print.
-      </p>
     </fieldset>
 
     <fieldset>
       <legend>CAPTCHA</legend>
-      <p>This helps prevent automated spam:</p>
-      <label for="captcha_field">Enter any word:</label>
+      <p>Enter any word to help prevent spam:</p>
       <%= text_field_tag 'captcha', nil, id: 'captcha_field', required: true %>
     </fieldset>
 
-    <%= submit_tag 'Submit Job', class: 'submit-button' %>
+    <%= submit_tag 'Submit Print Request', class: 'submit-button' %>
+    <p class="help-text">After receiving your submission, we'll get back to you within 48 hours (usually much sooner) to let you know how long it will take to print, how much filament will be used, and an approximate cost, or if we have any questions. Sometimes models do not scale correctly when imported into the slicer software, so if it looks wrong, we'll ask you what size to make the output object.</p>
   <% end %>
 </main>

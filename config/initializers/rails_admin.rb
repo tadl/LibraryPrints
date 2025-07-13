@@ -50,7 +50,6 @@ RailsAdmin.config do |config|
   # ──────────────────────────────────────────────────────
   # Printer, StaffUser, Patron, Conversation, Message
   # (all left unchanged)…
-  # ──────────────────────────────────────────────────────
 
   config.model 'Printer' do
     visible { bindings[:controller].current_staff_user.admin? }
@@ -114,6 +113,9 @@ RailsAdmin.config do |config|
     navigation_label 'Admin'
     weight           230
     label_plural     'Messages'
+    list do
+      exclude_fields :images
+    end
   end
 
   # ─ Job (formerly PrintJob) ────────────────────────────
@@ -124,12 +126,23 @@ RailsAdmin.config do |config|
 
     list do
       sort_by :created_at
-      field :id
+
       field :patron
       field :status
       field :category do
         label 'Category'
       end
+
+      field :type, :enum do
+        label 'Job Type'
+        enum { [['Print', 'PrintJob'], ['Scan', 'ScanJob']] }
+        filterable true
+        filter_options { [['Print', 'PrintJob'], ['Scan', 'ScanJob']] }
+        pretty_value do
+          value == 'PrintJob' ? 'Print' : 'Scan'
+        end
+      end
+
       field :print_type
       field :pickup_location
       field :assigned_printer do
@@ -183,8 +196,34 @@ RailsAdmin.config do |config|
       end
 
       ## Scan-only fields
-      field :scan_images, :active_storage do
+      field :scan_images do
+        label 'Scan Images'
         visible { bindings[:object].is_a?(ScanJob) }
+        pretty_value do
+          bindings[:object].scan_images.map do |attach|
+            # thumbnail
+            thumb = begin
+              bindings[:view].image_tag(
+                attach.variant(resize_to_limit: [100, 100])
+              )
+            rescue
+              ''
+            end
+
+            # manually build the relative blob path:
+            signed_id = attach.blob.signed_id
+            filename  = ERB::Util.url_encode(attach.filename.to_s)
+            blob_path = "/rails/active_storage/blobs/#{signed_id}/#{filename}"
+
+            link = bindings[:view].link_to(
+              attach.filename.to_s,
+              blob_path,
+              download: attach.filename.to_s
+            )
+
+            "#{thumb} #{link}"
+          end.join('<br>').html_safe
+        end
       end
       field :spray_ok do
         label   'Spray OK?'
@@ -224,6 +263,15 @@ RailsAdmin.config do |config|
         default_value { bindings[:object].type || 'PrintJob' }
       end
 
+      field :pickup_location, :enum do
+        label 'Pickup Location'
+        required true
+        enum do
+          PickupLocation.where(active: true).order(:position).map { |pl| [pl.name, pl.code] }
+        end
+        help 'Where should this job be picked up (or scan dropped off)?'
+      end
+
       group :print_fields do
         label   'Print-only fields'
         visible { bindings[:object].is_a?(PrintJob) }
@@ -236,11 +284,6 @@ RailsAdmin.config do |config|
         field :actual_weight
         field :actual_cost
         field :completion_date, :date
-        field :pickup_location, :enum do
-          enum do
-            PickupLocation.active.map { |pl| [pl.name, pl.code] }
-          end
-        end
         field :assigned_printer, :belongs_to_association do
           label 'Assigned Printer'
           inline_add   { bindings[:controller].current_staff_user.admin? }
@@ -253,20 +296,53 @@ RailsAdmin.config do |config|
       group :scan_fields do
         label   'Scan-only fields'
         visible { bindings[:object].is_a?(ScanJob) }
-        field :scan_images, :active_storage
-        field :spray_ok
-        field :notes
-        field :pickup_location, :enum do
-          enum do
-            PickupLocation.active.map { |pl| [pl.name, pl.code] }
+
+        field :scan_images, :active_storage do
+          # show a <input type="file" multiple>
+          html_attributes { { multiple: true } }
+
+          # disable RailsAdmin's built-in blob preview (which was blowing up)
+          pretty_value do
+            '' 
+          end
+
+          # use help text to render your own thumbnails + download links
+          help do
+            attachments = bindings[:object].scan_images
+            if attachments.any?
+              attachments.map do |attach|
+                # thumbnail
+                thumb = begin
+                          bindings[:view].image_tag(
+                            attach.variant(resize_to_limit: [100, 100])
+                          )
+                        rescue
+                          ''
+                        end
+                # manual blob path
+                signed_id = attach.blob.signed_id
+                filename  = ERB::Util.url_encode(attach.filename.to_s)
+                blob_path = "/rails/active_storage/blobs/#{signed_id}/#{filename}"
+
+                link = bindings[:view].link_to(
+                  attach.filename.to_s,
+                  blob_path,
+                  download: attach.filename.to_s
+                )
+
+                "#{thumb} #{link}"
+              end.join('<br>').html_safe
+            end
           end
         end
-      end
 
+        field :spray_ok
+        field :notes
+      end
       field :print_type, :enum do
         required true
         enum do
-          %w[FDM Resin Scan].map { |v| [v, v] }
+          %w[FDM Resin].map { |v| [v, v] }
         end
         default_value { 'FDM' }
       end
@@ -295,10 +371,27 @@ RailsAdmin.config do |config|
     weight           110
     label_plural     'Pickup Locations'
     list do
-      sort_by :name; field :name; field :code; field :active
+      sort_by :name
+      field :name
+      field :code
+      field :active
+      field :scanner
+      field :fdm_printer
+      field :resin_printer
     end
     edit do
-      field :name; field :code; field :active
+      field :name
+      field :code
+      field :active
+      field :scanner, :boolean do
+        help "Check if this location has a 3D scanner"
+      end
+      field :fdm_printer, :boolean do
+        help "Check if this location has an FDM printer"
+      end
+      field :resin_printer, :boolean do
+        help "Check if this location has a resin printer"
+      end
     end
   end
 end

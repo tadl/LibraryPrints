@@ -60,7 +60,11 @@
 
   <p>
     <strong>Pickup location:</strong>
-    <%= @job.pickup_location_name %>
+    <% if (loc = PickupLocation.find_by(code: @job.pickup_location)) %>
+      <%= loc.name %>
+    <% else %>
+      <%= @job.pickup_location.humanize %>
+    <% end %>
   </p>
 
   <% if @job.respond_to?(:assigned_printer) && @job.assigned_printer %>

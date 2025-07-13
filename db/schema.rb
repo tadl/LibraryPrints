@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_13_015928) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_13_123152) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -112,6 +112,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_13_015928) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "active", default: true, null: false
+    t.boolean "scanner", default: false, null: false
+    t.boolean "fdm_printer", default: false, null: false
+    t.boolean "resin_printer", default: false, null: false
   end
 
   create_table "print_job_notes", force: :cascade do |t|

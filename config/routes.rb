@@ -17,9 +17,13 @@ Rails.application.routes.draw do
   root to: 'portal#home'
 
   # 3D print & scan request submission
-  get  '/submit',    to: 'portal#submit',     as: :submit_job
-  post '/submit',    to: 'portal#create_job'
-  get  '/thank_you', to: 'portal#thank_you',  as: :thank_you
+  get  '/submit-print', to: 'portal#submit_print',      as: :submit_print
+  post '/submit-print', to: 'portal#create_print_job',  as: :create_print_job
+
+  get  '/submit-scan',  to: 'portal#submit_scan',       as: :submit_scan
+  post '/submit-scan',  to: 'portal#create_scan_job',   as: :create_scan_job
+
+  get '/thank-you',      to: 'portal#thank_you',        as: :thank_you
 
   # Magic-link login (token request)
   get  '/login',           to: 'portal#token_request',   as: :login

@@ -1,0 +1,76 @@
+<%= render 'shared/header' %>
+
+<main class="submit-job-page">
+  <h1>3D Scan Request Form</h1>
+
+  <% if flash[:alert].present? %>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
+  <% end %>
+
+  <%= form_tag submit_scan_path, multipart: true, local: true do %>
+
+    <fieldset>
+      <legend>Name</legend>
+      <label for="patron_first_name">First Name</label>
+      <%= text_field_tag 'patron[first_name]', params.dig(:patron, :first_name), id: 'patron_first_name', required: true %>
+
+      <label for="patron_last_name">Last Name</label>
+      <%= text_field_tag 'patron[last_name]', params.dig(:patron, :last_name), id: 'patron_last_name', required: true %>
+
+      <label for="patron_email">Email Address</label>
+      <%= email_field_tag 'patron[email]', params.dig(:patron, :email), id: 'patron_email', required: true %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Photos of the Object</legend>
+      <label for="job_scan_images">Upload photos</label>
+      <%= file_field_tag 'job[scan_images][]',
+            multiple: true,
+            accept: 'image/*',
+            id: 'job_scan_images' %>
+      <p class="help-text">Upload oen or more high-res photos from different angles.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Spray Coating OK?</legend>
+      <div class="form-group">
+        <%= select_tag 'job[spray_ok]',
+              options_for_select([ ['Yes, you may spray‐coat', true],
+                                   ['No, please don’t',           false] ],
+                                 params.dig(:job, :spray_ok)),
+              include_blank: 'Select an option',
+              id: 'job_spray_ok',
+              class: 'form-control' %>
+      </div>
+      <p class="help-text">Some objects that are reflective, shiny, or dark are difficult to scan. To remedy this, we apply a dry shampoo spray or AESUB scanning spray to improve the scanning result. Is this ok to do with this object?</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Notes</legend>
+      <label for="job_notes">Please describe the object and include any special instructions that may be needed.</label>
+      <%= text_area_tag 'job[notes]', params.dig(:job, :notes),
+            id: 'job_notes', rows: 4,
+            placeholder: 'e.g. fragile, brass fittings…' %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Pickup Location</legend>
+      <label for="job_pickup_location">Choose scanner location</label>
+      <%= select_tag 'job[pickup_location]',
+            options_for_select(
+              PickupLocation.scanners.pluck(:name, :code),
+              params.dig(:job, :pickup_location) || PickupLocation.scanners.first&.code
+            ),
+            id: 'job_pickup_location' %>
+      <p class="help-text">Select which location you’d like to bring your object to be scanned.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>CAPTCHA</legend>
+      <p>Enter any word to help prevent spam:</p>
+      <%= text_field_tag 'captcha', nil, id: 'captcha_field', required: true %>
+    </fieldset>
+
+    <%= submit_tag 'Submit Scan Request', class: 'submit-button' %>
+  <% end %>
+</main>

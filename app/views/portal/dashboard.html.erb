@@ -37,8 +37,12 @@
 
             <!-- Pickup location + assigned printer model (prints only) -->
             <td>
-              <%# if the model has a pickup_location_name method %>
-              <%= job.pickup_location_name if job.respond_to?(:pickup_location_name) %>
+              <% if (loc = PickupLocation.find_by(code: job.pickup_location)) %>
+                <%= loc.name %>
+              <% else %>
+                <%= job.pickup_location.humanize %>
+              <% end %>
+
               <% if job.respond_to?(:assigned_printer) && job.assigned_printer %>
                 <br>
                 <small>Printer: <%= job.assigned_printer.printer_model %></small>
