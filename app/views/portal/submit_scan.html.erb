@@ -57,10 +57,13 @@
       <legend>Pickup Location</legend>
       <label for="job_pickup_location">Choose scanner location</label>
       <%= select_tag 'job[pickup_location]',
-            options_for_select(
-              PickupLocation.scanners.pluck(:name, :code),
-              params.dig(:job, :pickup_location) || PickupLocation.scanners.first&.code
+            options_from_collection_for_select(
+              PickupLocation.where(scanner: true).order(:position),
+              :code,
+              :name,
+              params.dig(:job, :pickup_location) || PickupLocation.where(scanner: true).order(:position).first&.code
             ),
+            prompt: 'Choose a location',
             id: 'job_pickup_location' %>
       <p class="help-text">Select which location you’d like to bring your object to be scanned.</p>
     </fieldset>

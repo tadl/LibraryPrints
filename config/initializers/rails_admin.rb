@@ -10,6 +10,7 @@ RailsAdmin.config do |config|
   config.current_user_method(&:current_staff_user)
 
   config.asset_source = :sprockets
+  config.default_items_per_page = 10
 
   # ─ App name & included models ────────────────────────
   config.main_app_name   = ['Library Prints','Admin']
@@ -59,14 +60,33 @@ RailsAdmin.config do |config|
     label_plural      'Printers'
     list do
       sort_by :name
-      field :id; field :name; field :printer_type; field :printer_model; field :bed_size; field :location
+      field :id
+      field :name
+      field :pickup_location
+      field :printer_type
+      field :printer_model
+      field :bed_size
+      field :location
     end
     show do
-      field :id; field :name; field :printer_type; field :printer_model; field :bed_size; field :location
-      field :created_at; field :updated_at
+      field :id
+      field :name
+      field :pickup_location
+      field :printer_type
+      field :printer_model
+      field :bed_size
+      field :location
+      field :created_at
+      field :updated_at
     end
     edit do
       field :name
+      field :pickup_location, :belongs_to_association do  # ← this is the key
+        label 'Pickup Location'
+        inline_add  { bindings[:controller].current_staff_user.admin? }
+        inline_edit { bindings[:controller].current_staff_user.admin? }
+        associated_collection_scope { Proc.new { |scope| scope.order(:name) } }
+      end
       field :printer_type, :enum do
         enum { ['FDM', 'Resin', 'Scan'] }
         help 'e.g. FDM, Resin, Scan'
@@ -391,6 +411,17 @@ RailsAdmin.config do |config|
       end
       field :resin_printer, :boolean do
         help "Check if this location has a resin printer"
+      end
+      field :printers, :has_many_association do
+        label 'Printers at this Location'
+        help  'Select which printers live at this pickup location'
+        # optional: allow inline creation/editing
+        inline_add  { bindings[:controller].current_staff_user.admin? }
+        inline_edit { bindings[:controller].current_staff_user.admin? }
+        # order the dropdown by printer name
+        associated_collection_scope do
+          Proc.new { |scope| scope.order(:name) }
+        end
       end
     end
   end

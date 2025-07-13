@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_13_123152) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_13_182950) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -134,7 +134,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_13_123152) do
     t.string "location"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "pickup_location_id"
     t.index ["name"], name: "index_printers_on_name", unique: true
+    t.index ["pickup_location_id"], name: "index_printers_on_pickup_location_id"
   end
 
   create_table "staff_users", force: :cascade do |t|
@@ -162,4 +164,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_13_123152) do
   add_foreign_key "jobs", "printers", column: "assigned_printer_id"
   add_foreign_key "messages", "conversations"
   add_foreign_key "print_job_notes", "jobs", column: "print_job_id"
+  add_foreign_key "printers", "pickup_locations"
 end
