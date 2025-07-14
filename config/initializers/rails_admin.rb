@@ -18,6 +18,7 @@ RailsAdmin.config do |config|
     StaffUser
     Patron
     Job
+    Status
     Printer
     FilamentColor
     PickupLocation
@@ -41,7 +42,7 @@ RailsAdmin.config do |config|
     end
 
     delete do
-      only ['Message','FilamentColor']
+      only ['Message','FilamentColor','Status']
       visible do
         bindings[:controller].current_staff_user.admin?
       end
@@ -121,6 +122,36 @@ RailsAdmin.config do |config|
     label_plural     'Patrons'
   end
 
+  config.model 'Status' do
+    visible { bindings[:controller].current_staff_user.admin? }
+    navigation_label 'Admin'
+    weight           212
+    label_plural     'Statuses'
+
+    list do
+      field :id
+      field :name
+      field :code
+      field :position
+      field :jobs_count do
+        label 'Job Count'
+        # will call Status#jobs_count
+        pretty_value do
+          bindings[:object].jobs_count
+        end
+        # disable sorting/search on this virtual
+        sortable false
+        searchable false
+      end
+    end
+
+    edit do
+      field :name
+      field :code
+      field :position
+    end
+  end
+
   config.model 'Conversation' do
     visible { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Admin'
@@ -148,7 +179,16 @@ RailsAdmin.config do |config|
       sort_by :created_at
 
       field :patron
-      field :status
+      field :status, :belongs_to_association do
+        label 'Status'
+        pretty_value do
+          bindings[:object].status.name
+        end
+        filterable true
+        filter_options do
+          Status.all.map { |s| [s.name, s.id] }
+        end
+      end
       field :category do
         label 'Category'
       end
@@ -174,7 +214,12 @@ RailsAdmin.config do |config|
     show do
       field :id
       field :patron
-      field :status
+      field :status, :belongs_to_association do
+        label 'Status'
+        pretty_value do
+          bindings[:object].status.name
+        end
+      end
       field :category do
         label 'Category'
       end
@@ -266,7 +311,12 @@ RailsAdmin.config do |config|
         inline_edit  { bindings[:controller].current_staff_user.admin? }
       end
 
-      field :status
+      field :status, :belongs_to_association do
+        label 'Status'
+        associated_collection_scope do
+          Proc.new { |scope| scope.order(:position) }
+        end
+      end
 
       field :category, :enum do
         label    'Category'

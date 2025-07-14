@@ -1,54 +1,49 @@
-<%= render 'shared/header' %>
+<main class="home-page">
 
-<div class="container">
-  <h1>TADL 3D Print Management System</h1>
-
-  <!-- Calls to action -->
-  <div class="cta my-4 text-center">
-    <%= link_to 'Request 3D Print', submit_print_path, class: 'btn btn-primary btn-lg' %>
-  </div>
-  <div class="cta my-4 text-center">
-    <%= link_to 'Request 3D Scan', submit_scan_path, class: 'btn btn-primary btn-lg' %>
-  </div>
-
-  <!-- Live queue stats -->
-  <section class="my-5">
-    <h2>Queue Stats</h2>
-    <div class="stats d-flex justify-content-between flex-wrap">
-      <div class="stat text-center p-3">
-        <strong><%= Job.pending.count %></strong><br/>Pending
-      </div>
-      <div class="stat text-center p-3">
-        <strong><%= Job.queued.count %></strong><br/>Queued
-      </div>
-      <div class="stat text-center p-3">
-        <strong><%= Job.printing.count %></strong><br/>Printing
-      </div>
-      <div class="stat text-center p-3">
-        <strong><%= Job.ready_for_pickup.count %></strong><br/>Ready
+  <!-- Hero -->
+  <section class="hero text-center">
+    <div class="hero__content container">
+      <h1 class="hero__title">TADL 3D Print & Scan Center</h1>
+      <p class="hero__subtitle">Fast, Affordable, and High-Quality 3D Printing & Scanning for Our Community</p>
+      <div class="hero__buttons">
+        <%= link_to 'Request a Print', submit_print_path, class: 'btn btn-hero' %>
+        <%= link_to 'Request a Scan',  submit_scan_path,  class: 'btn btn-hero btn-hero--alt' %>
       </div>
     </div>
   </section>
 
-  <!-- About -->
-  <section class="about my-5">
-    <h2>About Our 3D Printing Service</h2>
-    <p>TADL’s 3D Printing service lets you turn your digital design into a real object—perfect for prototypes, spare parts, and more.</p>
-    <p>Learn more at <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener">tadl.org/services/3d-printing</a>.</p>
-  </section>
+  <div class="container">
 
-  <!-- Already have a request? -->
-  <section class="my-5 text-center">
-    <h2>Have existing prints?</h2>
-    <div class="cta">
+    <!-- Queue Stats -->
+    <section class="stats-grid my-8">
+      <%= [ ['Pending',      'pending'],
+            ['Queued',       'queued'],
+            ['Printing',     'printing'],
+            ['Ready Pickup', 'ready_for_pickup'] ].map do |label, code| %>
+        <div class="stats-card">
+          <div class="stats-card__count"><%= Job.with_status(code).count %></div>
+          <div class="stats-card__label"><%= label %></div>
+        </div>
+      <% end.join.html_safe %>
+    </section>
+
+    <!-- About Card -->
+    <section class="about-card my-8">
+      <h2>About Our Service</h2>
+      <p>TADL’s 3D Printing & Scanning service turns your ideas into reality — perfect for prototypes, spare parts, art projects, and more.</p>
+      <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener" class="btn btn-secondary">Learn More</a>
+    </section>
+
+    <!-- Existing Jobs -->
+    <section class="existing-jobs text-center my-8">
+      <h2>Already have a request?</h2>
       <% if cookies.encrypted[:patron_id] %>
-        <%= link_to 'Dashboard →', dashboard_path, class: 'btn btn-secondary' %>
+        <%= link_to 'Go to Dashboard →', dashboard_path, class: 'btn btn-primary' %>
       <% else %>
-        <p>Log in to view and manage your existing print jobs.</p>
-        <%= link_to 'Log in', login_path, class: 'btn btn-secondary' %>
+        <p>Log in to view and manage your existing jobs.</p>
+        <%= link_to 'Log in', login_path, class: 'btn btn-primary btn-pill' %>
       <% end %>
+    </section>
 
-    </div>
-  </section>
-</div>
-
+  </div>
+</main>

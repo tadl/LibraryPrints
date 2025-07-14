@@ -4,6 +4,7 @@ class Job < ApplicationRecord
   # (you’ve already set inheritance_column elsewhere)
   
   belongs_to :patron
+  belongs_to :status
 
   # Declare this here so RailsAdmin (and AR) know about it
   belongs_to :assigned_printer,
@@ -13,16 +14,11 @@ class Job < ApplicationRecord
   has_one  :conversation, dependent: :destroy
   after_create :build_conversation!
 
-  enum status: {
-    pending:           0,
-    info_requested:    1,
-    queued:            2,
-    printing:          3,
-    ready_for_pickup:  4,
-    archived:          5
-  }
-
   validates :status, presence: true
+
+  scope :with_status, ->(code) {
+    joins(:status).where(statuses: { code: code })
+  }
 
   private
 

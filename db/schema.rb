@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_13_182950) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_14_011505) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -59,7 +59,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_13_182950) do
 
   create_table "jobs", force: :cascade do |t|
     t.bigint "patron_id", null: false
-    t.integer "status"
     t.text "description"
     t.text "notes"
     t.datetime "created_at", null: false
@@ -78,8 +77,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_13_182950) do
     t.bigint "assigned_printer_id"
     t.boolean "spray_ok", default: false, null: false, comment: "Whether it’s OK to apply scanning spray/powder to the object"
     t.string "type", default: "PrintJob", null: false
+    t.bigint "status_id", null: false
     t.index ["assigned_printer_id"], name: "index_jobs_on_assigned_printer_id"
     t.index ["patron_id"], name: "index_jobs_on_patron_id"
+    t.index ["status_id"], name: "index_jobs_on_status_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -156,12 +157,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_13_182950) do
     t.index ["uid"], name: "index_staff_users_on_uid", unique: true
   end
 
+  create_table "statuses", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_statuses_on_code"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "conversations", "jobs"
   add_foreign_key "conversations", "jobs"
   add_foreign_key "jobs", "patrons"
   add_foreign_key "jobs", "printers", column: "assigned_printer_id"
+  add_foreign_key "jobs", "statuses"
   add_foreign_key "messages", "conversations"
   add_foreign_key "print_job_notes", "jobs", column: "print_job_id"
   add_foreign_key "printers", "pickup_locations"

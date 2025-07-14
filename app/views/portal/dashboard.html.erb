@@ -1,63 +1,46 @@
-<%= render "shared/header" %>
-
-<div class="content">
-  <p class="mt-4">
+<main class="dashboard container mx-auto py-8">
+  <p class="mb-4">
     <%= link_to "← Home", root_path, class: "view-link" %>
   </p>
-  <h1>Your Jobs</h1>
+
+  <h1 class="text-2xl font-semibold mb-6">Your Jobs</h1>
 
   <% if @jobs.any? %>
-    <table class="jobs-table">
-      <thead>
-        <tr>
-          <th>Submitted</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Location</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @jobs.each do |job| %>
-          <tr>
-            <!-- Submitted date -->
-            <td>
-              <%= job.created_at.strftime("%b %-d, %Y %l:%M %p") %>
-            </td>
-
-            <!-- Print vs Scan -->
-            <td>
-              <%= job.type.demodulize.delete_suffix("Job") %>
-            </td>
-
-            <!-- Status -->
-            <td>
-              <%= job.status.humanize %>
-            </td>
-
-            <!-- Pickup location + assigned printer model (prints only) -->
-            <td>
+    <div class="job-grid">
+      <% @jobs.each do |job| %>
+        <div class="job-card">
+          <div class="job-card__header">
+            <span class="job-card__date">
+              <%= job.created_at.strftime("%b %-d, %Y") %>
+            </span>
+            <span class="badge badge--<%= job.status.code.dasherize %>">
+              <%= job.status.name %>
+            </span>
+          </div>
+          <div class="job-card__body">
+            <p><strong>Type:</strong> <%= job.type.demodulize.delete_suffix("Job") %></p>
+            <p>
+              <strong>Location:</strong>
               <% if (loc = PickupLocation.find_by(code: job.pickup_location)) %>
                 <%= loc.name %>
               <% else %>
                 <%= job.pickup_location.humanize %>
               <% end %>
-
-              <% if job.respond_to?(:assigned_printer) && job.assigned_printer %>
-                <br>
-                <small>Printer: <%= job.assigned_printer.printer_model %></small>
-              <% end %>
-            </td>
-
-            <!-- Details link -->
-            <td>
-              <%= link_to "Details →", job_path(job), class: "view-link" %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+            </p>
+            <% if job.respond_to?(:assigned_printer) && job.assigned_printer %>
+              <p><strong>Printer:</strong> <%= job.assigned_printer.printer_model %></p>
+            <% end %>
+          </div>
+          <div class="job-card__footer">
+            <%= link_to "Details →", job_path(job), class: "btn btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   <% else %>
-    <p>You have no jobs yet. <%= link_to "Submit one now", submit_job_path %>.</p>
+    <div class="no-jobs text-center py-16">
+      <p class="text-lg mb-4">You have no jobs yet.</p>
+      <%= link_to "Submit one now", submit_job_path, class: "btn btn-primary" %>
+    </div>
   <% end %>
-</div>
+</main>
