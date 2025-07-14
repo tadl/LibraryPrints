@@ -24,7 +24,7 @@ class PortalController < ApplicationController
 
     @job = PrintJob.new(print_job_params)
     @job.patron   = @patron
-    @job.category = 'Patron'
+    @job.category = Category.find_by!(name: 'Patron')
     @job.status   = Status.find_by!(code: 'pending')
 
     if @job.save
@@ -49,7 +49,7 @@ class PortalController < ApplicationController
     # build a ScanJob directly so attachments and STI behave
     @job = ScanJob.new(scan_job_params)
     @job.patron   = @patron
-    @job.category = 'Patron'
+    @job.category = Category.find_by!(name: 'Patron')
     @job.status   = Status.find_by!(code: 'pending')
 
     if @job.save

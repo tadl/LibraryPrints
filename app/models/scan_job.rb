@@ -4,7 +4,7 @@ class ScanJob < Job
 
   has_one_attached :scan_image
 
-  validates :category, inclusion: { in: %w[Patron Staff Assistive\ Aid Fidget Scan] }
+  validates :category, presence: true
 
   validates :status, presence: true
 

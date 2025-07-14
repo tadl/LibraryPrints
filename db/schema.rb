@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_14_153545) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_14_203631) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_153545) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "categories", force: :cascade do |t|
+    t.string "name"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "conversations", force: :cascade do |t|
     t.bigint "job_id", null: false
     t.datetime "created_at", null: false
@@ -66,7 +73,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_153545) do
     t.string "url"
     t.string "filament_color"
     t.string "pickup_location"
-    t.string "category"
     t.integer "print_time_estimate"
     t.decimal "slicer_weight", precision: 10, scale: 2
     t.decimal "slicer_cost", precision: 10, scale: 2
@@ -78,7 +84,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_153545) do
     t.string "type", default: "PrintJob", null: false
     t.bigint "status_id", null: false
     t.string "print_type_code"
+    t.bigint "category_id", null: false
     t.index ["assigned_printer_id"], name: "index_jobs_on_assigned_printer_id"
+    t.index ["category_id"], name: "index_jobs_on_category_id"
     t.index ["patron_id"], name: "index_jobs_on_patron_id"
     t.index ["status_id"], name: "index_jobs_on_status_id"
   end
@@ -180,6 +188,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_153545) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "conversations", "jobs"
   add_foreign_key "conversations", "jobs"
+  add_foreign_key "jobs", "categories"
   add_foreign_key "jobs", "patrons"
   add_foreign_key "jobs", "printers", column: "assigned_printer_id"
   add_foreign_key "jobs", "statuses"

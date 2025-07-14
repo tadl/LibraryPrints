@@ -36,3 +36,19 @@ end
     pt.position = i
   end
 end
+
+categories = [
+  { name: 'Patron',        position: 1 },
+  { name: 'Staff',         position: 2 },
+  { name: 'Assistive Aid', position: 3 },
+  { name: 'Fidget',        position: 4 },
+]
+
+categories.each do |attrs|
+  cat = Category.find_or_initialize_by(name: attrs[:name])
+  # only update position if changed (optional)
+  if cat.new_record? || cat.position != attrs[:position]
+    cat.position = attrs[:position]
+    cat.save!
+  end
+end

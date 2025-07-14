@@ -6,9 +6,6 @@ class PrintJob < Job
              class_name: 'Printer',
              optional:   true
 
-  JOB_CATEGORIES = %w[Patron Staff Assistive\ Aid Fidget Scan].freeze
-
-  validates :category, inclusion: { in: JOB_CATEGORIES }
   validates :status,   presence: true
 
   # only on update do we *really* require a print_type

@@ -2,8 +2,8 @@
 class Job < ApplicationRecord
   belongs_to :patron
   belongs_to :status
+  belongs_to :category
 
-  # Declare this here so RailsAdmin (and AR) know about it
   belongs_to :assigned_printer,
              class_name: 'Printer',
              optional:   true
