@@ -157,12 +157,15 @@ class PortalController < ApplicationController
       @patron = Patron.find_by(access_token: params[:token])
       head :unauthorized and return unless @patron&.token_valid?
 
+      # set the cookie for future requests
       cookies.encrypted[:patron_id] = {
-        value:   @patron.id,
+        value:    @patron.id,
         httponly: true,
-        expires: 4.hours.from_now
+        expires:  4.hours.from_now
       }
-      session.delete(:patron_token)
+
+      # now redirect off of the token‐bearing URL
+      redirect_to dashboard_path and return
 
     else
       head :unauthorized and return

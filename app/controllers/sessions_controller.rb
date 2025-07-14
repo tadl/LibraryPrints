@@ -1,3 +1,4 @@
+# app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
   # -- your existing staff login logic stays untouched --
   def create
@@ -9,32 +10,22 @@ class SessionsController < ApplicationController
 
   # DELETE /logout
   def destroy
-    # —— Staff logout ——
     if current_staff_user
-      # Clear the staff-user session
       session.delete(:staff_user_id)
-
-      # (Optional) If you stored an OAuth token for staff, revoke it here
-      # revoke_oauth_token(session[:oauth_token]) if session[:oauth_token]
-      # session.delete(:oauth_token)
-
       reset_session
       redirect_to root_path, notice: "Staff user signed out."
 
-    # —— Patron logout ——
     elsif cookies.encrypted[:patron_id]
-      # If you stored a token in session or db for patrons, revoke/clear it
-      session.delete(:access_token)
+      # expire the Patron’s token so the magic-link can’t be reused
+      if (patron = Patron.find_by(id: cookies.encrypted[:patron_id]))
+        patron.expire_token!
+      end
 
-      # Remove the patron cookie
       cookies.delete(:patron_id)
-
       reset_session
       redirect_to root_path, notice: "You’ve been logged out."
 
-    # —— Fallback ——
     else
-      # No one was logged in
       reset_session
       redirect_to root_path
     end
