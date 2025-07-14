@@ -1,16 +1,17 @@
-<div class="container py-5 d-flex justify-content-center">
-  <div class="card shadow-sm w-100 w-md-50">
-    <div class="card-body text-center">
-      <i class="fa fa-envelope fa-3x mb-3 text-primary"></i>
-      <h1 class="h3 mb-3">Check Your Inbox</h1>
-      <p class="mb-4">
-        We’ve sent you an email with a secure login link to manage your 3D print jobs.
-        Please check your inbox—and if you don’t see it, your spam folder.
-      </p>
-      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-        <%= link_to 'Resend Login Link', login_path, class: 'btn btn-outline-primary me-sm-2' %>
-        <%= link_to 'Submit New Request', submit_job_path, class: 'btn btn-primary' %>
-      </div>
+<main class="token-thank-you container mx-auto py-12">
+  <div class="card card--hero mx-auto">
+    <div class="card__icon">
+      <i class="fa fa-envelope fa-3x"></i>
+    </div>
+    <h1 class="card__title">Check Your Inbox</h1>
+    <p class="card__text">
+      We’ve sent you an email with a secure login link to manage your 3D print jobs.
+      Please check your inbox—and if you don’t see it, your spam folder.
+    </p>
+    <div class="card__actions">
+      <%= link_to 'Resend Login Link', login_path, class: 'btn btn-outline' %>
+      <%= link_to 'Submit a Print', submit_print_path, class: 'btn btn-primary' %>
+      <%= link_to 'Submit a Scan',  submit_scan_path,  class: 'btn btn-secondary' %>
     </div>
   </div>
-</div>
+</main>

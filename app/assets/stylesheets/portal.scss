@@ -1,5 +1,18 @@
-/* portal.scss */
+/* app/assets/stylesheets/portal.scss */
 
+/* Global container padding */
+.container {
+  padding: 0 1rem;
+}
+
+/* Content wrapper for show/list pages */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* ===== Job Details ===== */
 .job-details.container {
   max-width: 800px;
   margin: 0 auto;
@@ -15,7 +28,7 @@
 
 .job-details .job-card-header {
   background: linear-gradient(90deg, #1e3a8a, #2563eb);
-  color: white;
+  color: #fff;
   padding: 1.5rem;
 }
 
@@ -96,8 +109,8 @@
   border-radius: 4px;
   margin-top: 0.5rem;
 }
-/* portal.scss */
 
+/* ===== Jobs Table ===== */
 .jobs-table {
   width: 100%;
   border-collapse: collapse;
@@ -107,17 +120,17 @@
 .jobs-table th,
 .jobs-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb; /* light gray */
+  border-bottom: 1px solid #e5e7eb;
   text-align: left;
 }
 
 .jobs-table thead th {
-  background-color: #f3f4f6; /* slightly darker header row */
+  background-color: #f3f4f6;
   font-weight: 600;
 }
 
 .jobs-table tbody tr:nth-child(even) {
-  background-color: #f9fafb; /* zebra striping */
+  background-color: #f9fafb;
 }
 
 .jobs-table .view-link {
@@ -129,16 +142,7 @@
   text-decoration: underline;
 }
 
-/* Optional: make the container narrower, like the show page */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-/* portal.scss */
-
-/* Hero Section */
+/* ===== Hero Section ===== */
 .home-page .hero {
   background: image-url('3d-hero.png') center/cover no-repeat;
   color: #fff;
@@ -149,34 +153,32 @@
     max-width: 580px;
     margin: 0 auto;
   }
-
   &__title {
     font-size: 3rem;
     margin-bottom: 0.5rem;
   }
-
   &__subtitle {
     font-size: 1.25rem;
     margin-bottom: 2rem;
   }
-
-  &__buttons .btn-hero {
-    display: inline-block;
-    background: #2563eb;
-    color: #fff;
-    padding: 0.75rem 1.5rem;
-    margin: 0 0.5rem;
-    font-size: 1rem;
-    border-radius: 9999px;
-    text-decoration: none;
-  }
-
-  &__buttons .btn-hero--alt {
-    background: #10b981;
+  &__buttons {
+    .btn-hero {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      margin: 0 0.5rem;
+      font-size: 1rem;
+      border-radius: 9999px;
+      text-decoration: none;
+    }
+    .btn-hero--alt {
+      background: #10b981;
+    }
   }
 }
 
-/* Stats Grid */
+/* ===== Stats Grid ===== */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -195,7 +197,6 @@
     font-weight: bold;
     color: #2563eb;
   }
-
   &__label {
     margin-top: 0.5rem;
     font-size: 1rem;
@@ -203,7 +204,7 @@
   }
 }
 
-/* About Card */
+/* ===== About Card ===== */
 .about-card {
   background: #f3f4f6;
   border-left: 4px solid #2563eb;
@@ -216,12 +217,10 @@
     margin-bottom: 1rem;
     color: #111827;
   }
-
   p {
     margin-bottom: 1.5rem;
     color: #4b5563;
   }
-
   .btn-secondary {
     background: #2563eb;
     color: #fff !important;
@@ -231,17 +230,15 @@
   }
 }
 
-/* Existing Jobs Section */
+/* ===== Existing Jobs Section ===== */
 .existing-jobs {
   background: #eef2ff;
   padding: 2rem;
   border-radius: 8px;
-
   h2 {
     margin-bottom: 1rem;
     color: #1f2937;
   }
-
   .btn-primary {
     background: #2563eb;
     color: #fff !important;
@@ -249,21 +246,18 @@
     text-decoration: none;
     border-radius: 9999px;
   }
-
   .btn-pill {
     border-radius: 9999px;
   }
 }
 
-/* Dashboard cards */
-
+/* ===== Dashboard Cards ===== */
 .dashboard {
   .job-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1.5rem;
   }
-
   .job-card {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -280,48 +274,40 @@
       justify-content: space-between;
       align-items: center;
     }
-
     &__date {
       font-size: 0.875rem;
       color: #6b7280;
     }
-
     &__body {
       padding: 1rem;
       flex-grow: 1;
-
       p {
         margin: 0.5rem 0;
         color: #374151;
       }
-
       strong {
         color: #111827;
       }
     }
-
     &__footer {
       padding: 0.75rem 1rem;
       background: #f9fafb;
       text-align: right;
     }
   }
-
-  /* Small utility badge by status code */
   .badge {
     display: inline-block;
     padding: 0.25rem 0.5rem;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 600;
+
     &--pending          { background: #fef3c7; color: #92400e; }
     &--queued           { background: #dbeafe; color: #1e40af; }
     &--printing         { background: #e0f2fe; color: #0369a1; }
     &--ready-for-pickup { background: #dcfce7; color: #166534; }
     &--completed        { background: #ecfdf5; color: #0f5132; }
   }
-
-  /* Buttons */
   .btn {
     display: inline-block;
     padding: 0.5rem 1rem;
@@ -335,13 +321,10 @@
       font-size: 0.75rem;
       padding: 0.25rem 0.5rem;
     }
-
     &:hover {
       background: #1e40af;
     }
   }
-
-  /* No-jobs state */
   .no-jobs {
     max-width: 400px;
     margin: 0 auto;
@@ -353,7 +336,65 @@
   }
 }
 
-/* Ensure .container has some padding */
-.container {
-  padding: 0 1rem;
+/* ===== Token Thank You Card ===== */
+.token-thank-you {
+  .card--hero {
+    max-width: 600px;
+    width: 90%;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    padding: 2rem;
+    text-align: center;
+
+    &__icon {
+      color: #2563eb;
+      margin-bottom: 1rem;
+    }
+    &__title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #111827;
+    }
+    &__text {
+      color: #4b5563;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    &__actions {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+  }
+  .btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    text-decoration: none;
+
+    &-primary {
+      background: #2563eb;
+      color: #fff !important;
+    }
+    &-secondary {
+      background: #10b981;
+      color: #fff !important;
+    }
+    &-outline {
+      background: transparent;
+      border: 2px solid #2563eb;
+      color: #2563eb !important;
+      &:hover {
+        background: #2563eb;
+        color: #fff !important;
+      }
+    }
+    &:hover {
+      opacity: 0.9;
+    }
+  }
 }

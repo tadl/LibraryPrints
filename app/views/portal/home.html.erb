@@ -3,8 +3,8 @@
   <!-- Hero -->
   <section class="hero text-center">
     <div class="hero__content container">
-      <h1 class="hero__title">TADL 3D Print & Scan Center</h1>
-      <p class="hero__subtitle">Fast, Affordable, and High-Quality 3D Printing & Scanning for Our Community</p>
+      <h1 class="hero__title">TADL 3D Print &amp; Scan Center</h1>
+      <p class="hero__subtitle">Fast, Affordable, and High-Quality 3D Printing &amp; Scanning for Our Community</p>
       <div class="hero__buttons">
         <%= link_to 'Request a Print', submit_print_path, class: 'btn btn-hero' %>
         <%= link_to 'Request a Scan',  submit_scan_path,  class: 'btn btn-hero btn-hero--alt' %>
@@ -19,7 +19,7 @@
       <%= [ ['Pending',      'pending'],
             ['Queued',       'queued'],
             ['Printing',     'printing'],
-            ['Ready Pickup', 'ready_for_pickup'] ].map do |label, code| %>
+            ['Ready', 'ready_for_pickup'] ].map do |label, code| %>
         <div class="stats-card">
           <div class="stats-card__count"><%= Job.with_status(code).count %></div>
           <div class="stats-card__label"><%= label %></div>
@@ -30,7 +30,7 @@
     <!-- About Card -->
     <section class="about-card my-8">
       <h2>About Our Service</h2>
-      <p>TADL’s 3D Printing & Scanning service turns your ideas into reality — perfect for prototypes, spare parts, art projects, and more.</p>
+      <p>TADL’s 3D Printing &amp; Scanning service turns your ideas into reality — perfect for prototypes, spare parts, art projects, and more.</p>
       <a href="https://www.tadl.org/services/3d-printing" target="_blank" rel="noopener" class="btn btn-secondary">Learn More</a>
     </section>
 
