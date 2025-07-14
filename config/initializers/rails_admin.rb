@@ -203,7 +203,6 @@ RailsAdmin.config do |config|
         end
       end
 
-      field :print_type
       field :pickup_location
       field :assigned_printer do
         label 'Assigned Printer'
