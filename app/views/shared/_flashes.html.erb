@@ -1,0 +1,16 @@
+<% flash.each do |type, message| %>
+  <% css_class = case type.to_sym
+       when :notice then "flash flash--success"
+       when :alert  then "flash flash--danger"
+       else "flash flash--#{type}"
+     end %>
+  <div class="<%= css_class %>">
+    <span class="flash__message"><%= message %></span>
+    <button type="button"
+            class="flash__close"
+            aria-label="Dismiss"
+            onclick="this.closest('.flash').remove()">
+      &times;
+    </button>
+  </div>
+<% end %>

@@ -146,19 +146,24 @@ class PortalController < ApplicationController
     )
   end
 
-  # Load/validate a patron via cookie or token
   def load_patron
     if cookies.encrypted[:patron_id].present?
       @patron = Patron.find_by(id: cookies.encrypted[:patron_id])
       head :unauthorized and return unless @patron&.token_valid?
-    else
-      token = params[:token] || session[:patron_token]
-      head :unauthorized and return unless token
 
-      @patron = Patron.find_by(access_token: token)
+    elsif params[:token].present?
+      @patron = Patron.find_by(access_token: params[:token])
       head :unauthorized and return unless @patron&.token_valid?
 
-      session[:patron_token] ||= token
+      cookies.encrypted[:patron_id] = {
+        value:   @patron.id,
+        httponly: true,
+        expires: 4.hours.from_now
+      }
+      session.delete(:patron_token)
+
+    else
+      head :unauthorized and return
     end
   end
 

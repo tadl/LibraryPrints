@@ -12,9 +12,10 @@
 
   <body>
     <%= render "shared/header" %>
-    <% flash.each do |type, message| %>
-      <div class="flash flash-<%= type %>"><%= message %></div>
-    <% end %>
+    <div class="px-4">
+      <%= render "shared/flashes" %>
+    </div>
+
     <%= yield %>
   </body>
 </html>
