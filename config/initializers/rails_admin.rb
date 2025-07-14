@@ -346,7 +346,13 @@ RailsAdmin.config do |config|
         visible { bindings[:object].is_a?(PrintJob) }
         field :model_file, :active_storage
         field :url
-        field :filament_color
+        field :filament_color, :enum do
+          label 'Filament Color'
+          enum do
+            FilamentColor.order(:name).pluck(:name, :code)
+          end
+          default_value { bindings[:object].filament_color }
+        end
         field :print_time_estimate
         field :slicer_weight
         field :slicer_cost
