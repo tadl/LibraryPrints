@@ -6,18 +6,19 @@ class PrintJob < Job
              class_name: 'Printer',
              optional:   true
 
-  has_one_attached :model_file
-
   JOB_CATEGORIES = %w[Patron Staff Assistive\ Aid Fidget Scan].freeze
 
-  validates :category,   inclusion: { in: JOB_CATEGORIES }
+  validates :category, inclusion: { in: JOB_CATEGORIES }
+  validates :status,   presence: true
 
-  validates :status, presence: true
+  # only on update do we *really* require a print_type
+  with_options on: :update do
+    validates :print_type,      presence: true
+    validates :print_type_code, presence: true,
+                                inclusion: { in: -> { PrintType.pluck(:code) } }
+  end
 
-  validates :print_type_code,
-            presence: true,
-            inclusion: { in: -> { PrintType.pluck(:code) } }
-
+  # everything else stays the same
   validates :url,
             format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]),
                       message: 'must be a valid URL' },
@@ -33,18 +34,6 @@ class PrintJob < Job
   validates :filament_color, length: { maximum: 50 }, allow_blank: true
 
   validate :url_or_model_file_present
-
-  # “Pretty” name for the pickup_location code
-  def pickup_location_name
-    PickupLocation.find_by(code: pickup_location)&.name ||
-      pickup_location.humanize
-  end
-
-  def print_time_estimate_duration
-    return unless print_time_estimate
-
-    ActiveSupport::Duration.build(print_time_estimate.minutes)
-  end
 
   private
 

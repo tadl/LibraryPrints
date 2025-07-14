@@ -25,10 +25,10 @@ class PortalController < ApplicationController
     @job = PrintJob.new(print_job_params)
     @job.patron   = @patron
     @job.category = 'Patron'
-    @job.status   = 'pending'
+    @job.status   = Status.find_by!(code: 'pending')
 
     if @job.save
-      redirect_to thank_you_path
+      redirect_to thank_you_path(kind: 'print')
     else
       flash.now[:alert] = @job.errors.full_messages.to_sentence
       render :submit_print, status: :unprocessable_entity
@@ -50,10 +50,10 @@ class PortalController < ApplicationController
     @job = ScanJob.new(scan_job_params)
     @job.patron   = @patron
     @job.category = 'Patron'
-    @job.status   = 'pending'
+    @job.status   = Status.find_by!(code: 'pending')
 
     if @job.save
-      redirect_to thank_you_path
+      redirect_to thank_you_path(kind: 'scan')
     else
       flash.now[:alert] = @job.errors.full_messages.to_sentence
       render :submit_scan, status: :unprocessable_entity
@@ -62,6 +62,7 @@ class PortalController < ApplicationController
 
   # Shared thank you page
   def thank_you
+    @kind = params[:kind]
   end
 
   # “Log in” page (enter your email)
