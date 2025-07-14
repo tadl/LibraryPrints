@@ -5,6 +5,7 @@ class Job < ApplicationRecord
   
   belongs_to :patron
   belongs_to :status
+  belongs_to :print_type, primary_key: :code, foreign_key: :print_type_code, optional: true
 
   # Declare this here so RailsAdmin (and AR) know about it
   belongs_to :assigned_printer,

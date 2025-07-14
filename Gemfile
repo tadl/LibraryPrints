@@ -79,3 +79,5 @@ gem 'sassc-rails'
 
 # load .env in development & test
 gem 'dotenv-rails', groups: [:development, :test]
+
+gem 'bootstrap', '~> 5.3'

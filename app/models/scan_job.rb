@@ -2,10 +2,9 @@
 class ScanJob < Job
   self.table_name = 'jobs'
 
-  has_many_attached :scan_images
+  has_one_attached :scan_image
 
   validates :category, inclusion: { in: %w[Patron Staff Assistive\ Aid Fidget Scan] }
-  validates :print_type, inclusion: { in: %w[FDM Resin Scan] }  # if you still need that
 
   validates :status, presence: true
 

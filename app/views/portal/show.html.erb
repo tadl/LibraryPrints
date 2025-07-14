@@ -1,89 +1,116 @@
-<main class="job-details container mx-auto py-8">
-  <%= link_to "← Dashboard", dashboard_path, class: "text-blue-600 hover:underline mb-4 inline-block" %>
+<main class="job-details container my-5">
+  <!-- Back link -->
+  <p>
+    <%= link_to "← Dashboard", dashboard_path, class: "text-decoration-none mb-3 d-inline-block" %>
+  </p>
 
-  <div class="bg-white shadow rounded-lg overflow-hidden">
-    <div class="bg-gradient-to-r from-blue-800 to-blue-600 p-6 text-white">
-      <h1 class="text-2xl font-bold">
-        <%= @job.is_a?(PrintJob) ? "Print Request" : "Scan Request" %> #<%= @job.id %>
-      </h1>
-      <p class="mt-2">
-        <span class="font-semibold">Status:</span>
-        <span class="badge badge--status"><%= @job.status.name %></span>
-      </p>
+  <div class="card shadow-sm">
+    <!-- Header -->
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">
+        <%= @job.is_a?(PrintJob) ? "Print Request" : "Scan Request" %>
+        <small class="text-light">#<%= @job.id %></small>
+      </h2>
+      <%= bootstrap_status_badge(@job.status) %>
     </div>
 
-    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <dl>
-        <dt class="font-semibold">Submitted:</dt>
-        <dd><%= @job.created_at.strftime("%b %-d, %Y %l:%M %p") %></dd>
-
-        <dt class="mt-4 font-semibold">Pickup Location:</dt>
-        <dd>
-          <% if (loc = PickupLocation.find_by(code: @job.pickup_location)) %>
-            <%= loc.name %>
-          <% else %>
-            <%= @job.pickup_location.humanize %>
-          <% end %>
-        </dd>
-
-        <% if @job.is_a?(PrintJob) %>
-          <dt class="mt-4 font-semibold">Filament Color:</dt>
-          <dd><%= @job.filament_color.presence || "—" %></dd>
-        <% end %>
-
-        <% if @job.respond_to?(:assigned_printer) && @job.assigned_printer %>
-          <dt class="mt-4 font-semibold">Assigned Printer:</dt>
-          <dd><%= @job.assigned_printer.name %></dd>
-        <% end %>
-      </dl>
-
-      <div>
-        <% if @job.is_a?(PrintJob) %>
-          <h2 class="font-semibold mb-2">Model File</h2>
-          <% if @job.model_file.attached? %>
-            <%= link_to @job.model_file.filename.to_s,
-                        rails_blob_path(@job.model_file, disposition: "attachment"),
-                        class: "text-blue-600 hover:underline" %>
-          <% elsif @job.url.present? %>
-            <%= link_to @job.url, @job.url, target: "_blank", rel: "noopener", class: "text-blue-600 hover:underline" %>
-          <% else %>
-            <span>—</span>
-          <% end %>
-        <% else %>
-          <h2 class="font-semibold mb-2">Submitted Photos</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <% @job.scan_images.each do |img| %>
-              <%= link_to url_for(img), target: "_blank" do %>
-                <%= image_tag img.variant(resize_to_limit: [300, 300]), class: "rounded-lg shadow-md" %>
+    <!-- Body -->
+    <div class="card-body">
+      <div class="row gx-4">
+        <!-- Left: metadata (50%) -->
+        <div class="col-md-6">
+          <table class="table table-borderless mb-0">
+            <tbody>
+              <% info = [] %>
+              <% info << ['Submitted', @job.created_at.strftime("%b %-d, %Y %l:%M %p")] %>
+              <% if (loc = PickupLocation.find_by(code: @job.pickup_location)) %>
+                <% info << ['Pickup Location', loc.name] %>
+              <% elsif @job.pickup_location.present? %>
+                <% info << ['Pickup Location', @job.pickup_location.humanize] %>
               <% end %>
-            <% end %>
-          </div>
 
-          <p class="mt-4"><strong>Spray OK?</strong> <%= @job.spray_ok? ? "Yes" : "No" %></p>
-        <% end %>
+              <% if @job.is_a?(PrintJob) %>
+                <% info << ['Print Type', @job.print_type&.name]          if @job.print_type %>
+                <% info << ['Filament Color', @job.filament_color]        if @job.filament_color.present? %>
+                <% info << ['Est. Print Time', "#{@job.print_time_estimate} min"] if @job.print_time_estimate.present? %>
+                <% info << ['Slicer Weight', "#{@job.slicer_weight} g"]     if @job.slicer_weight.present? %>
+                <% info << ['Slicer Cost', number_to_currency(@job.slicer_cost)] if @job.slicer_cost.present? %>
+                <% info << ['Actual Weight', "#{@job.actual_weight} g"]     if @job.actual_weight.present? %>
+                <% info << ['Actual Cost', number_to_currency(@job.actual_cost)] if @job.actual_cost.present? %>
+                <% info << ['Completed On', @job.completion_date.strftime("%b %-d, %Y")] if @job.completion_date.present? %>
+              <% else %>
+                <% info << ['Spray OK?', @job.spray_ok? ? 'Yes' : 'No'] %>
+              <% end %>
+
+              <% info << ['Assigned Printer', @job.assigned_printer.printer_model] if @job.assigned_printer %>
+              <% info << ['Notes',            @job.notes]           if @job.notes.present? %>
+              <% info << ['Description',      @job.description]     if @job.description.present? %>
+
+              <% info.each do |label, value| %>
+                <tr>
+                  <th class="w-50 text-end pe-3 align-middle"><%= label %></th>
+                  <td class="align-middle"><%= value.presence || '—' %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Right: file/photo (50%) -->
+        <div class="col-md-6">
+          <% if @job.is_a?(PrintJob) %>
+            <h5 class="fw-semibold">Model</h5>
+            <% if @job.model_file.attached? %>
+              <p>
+                <%= link_to @job.model_file.filename,
+                            rails_blob_path(@job.model_file, disposition: 'attachment'),
+                            class: 'text-decoration-none' %>
+              </p>
+            <% elsif @job.url.present? %>
+              <p>
+                <%= link_to @job.url, @job.url,
+                            target: '_blank', rel: 'noopener',
+                            class: 'text-decoration-none' %>
+              </p>
+            <% else %>
+              <p class="text-muted">No model provided.</p>
+            <% end %>
+          <% else %>
+            <h5 class="fw-semibold">Submitted Photo</h5>
+            <% if @job.scan_image.attached? %>
+              <%= link_to url_for(@job.scan_image), target: '_blank' do %>
+                <%= image_tag @job.scan_image.variant(resize_to_limit: [400,400]),
+                              class: 'img-fluid rounded shadow-sm mb-2' %>
+              <% end %>
+            <% else %>
+              <p class="text-muted">No photo uploaded.</p>
+            <% end %>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Messages -->
   <% if @messages.any? %>
-    <section class="mt-8">
-      <h2 class="text-xl font-bold mb-4">Messages</h2>
-      <div class="space-y-4">
-        <%= render partial: "portal/message", collection: @messages, as: :message %>
+    <div class="card mt-4">
+      <div class="card-header">Messages</div>
+      <div class="card-body">
+        <% @messages.each do |message| %>
+          <%= render "portal/message", message: message %>
+        <% end %>
       </div>
-    </section>
+    </div>
   <% end %>
 
-  <section class="mt-8">
-    <h3 class="text-lg font-semibold mb-2">Send us a message</h3>
-    <%= form_with url: job_conversation_path(@job), scope: :message, local: true, class: "space-y-4" do |f| %>
-      <div>
-        <%= f.text_area :body,
-                        placeholder: "Type your message…",
-                        rows: 4,
-                        class: "w-full border rounded p-2" %>
+  <!-- New message form -->
+  <div class="mt-4">
+    <h5>Send us a message</h5>
+    <%= form_with url: job_conversation_path(@job), scope: :message, local: true do |f| %>
+      <div class="mb-3">
+        <%= f.text_area :body, class: 'form-control', rows: 4, placeholder: 'Type your message…' %>
       </div>
-      <%= f.submit "Send", class: "btn btn-primary" %>
+      <%= f.submit 'Send', class: 'btn btn-primary' %>
     <% end %>
-  </section>
+  </div>
 </main>

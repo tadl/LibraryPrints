@@ -1,5 +1,6 @@
 # app/controllers/portal_controller.rb
 class PortalController < ApplicationController
+  helper :portal
   layout 'application'
 
   # Need a logged-in patron for dashboard/show/create_message
@@ -139,7 +140,7 @@ class PortalController < ApplicationController
 
   def scan_job_params
     params.require(:job).permit(
-      { scan_images: [] },   # allow multiple uploads
+      :scan_image,
       :spray_ok,
       :notes,
       :pickup_location

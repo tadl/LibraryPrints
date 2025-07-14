@@ -26,3 +26,13 @@ pickup_locations.each do |attrs|
   loc = PickupLocation.find_or_initialize_by(code: attrs[:code])
   loc.update!(name: attrs[:name], position: attrs[:position])
 end
+
+[
+  ['FDM',   'fdm'],
+  ['Resin', 'resin']
+].each.with_index(1) do |(n,c), i|
+  PrintType.find_or_create_by!(code: c) do |pt|
+    pt.name     = n
+    pt.position = i
+  end
+end

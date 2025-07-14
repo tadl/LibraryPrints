@@ -22,11 +22,10 @@
     <fieldset>
       <legend>Photos of the Object</legend>
       <label for="job_scan_images">Upload photos</label>
-      <%= file_field_tag 'job[scan_images][]',
-            multiple: true,
+      <%= file_field_tag 'job[scan_image]',
             accept: 'image/*',
-            id: 'job_scan_images' %>
-      <p class="help-text">Upload oen or more high-res photos from different angles.</p>
+            id: 'job_scan_image' %>
+      <p class="help-text">Upload a high-res photo of the object you wish to have scanned. We use this to assist with our evaluation of the job. If you can, include a ruler or common household object in the photo to give a sense of scale.</p>
     </fieldset>
 
     <fieldset>

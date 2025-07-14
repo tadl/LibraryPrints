@@ -37,16 +37,16 @@
   font-size: 1.5rem;
 }
 
-.job-details .job-card-body {
+.job-details > .bg-white > .p-6 {
+  /* mirror the Tailwind grid */
   display: grid;
   grid-template-columns: 1fr;
-  grid-gap: 1.5rem;
-  padding: 1.5rem;
+  gap: 1.5rem;
 }
 
-@media (min-width: 640px) {
-  .job-details .job-card-body {
-    grid-template-columns: 1fr 1fr;
+@media (min-width: 768px) { /* md */
+  .job-details > .bg-white > .p-6 {
+    grid-template-columns: 1fr 2fr;
   }
 }
 

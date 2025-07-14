@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_14_011505) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_14_153545) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -67,7 +67,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_011505) do
     t.string "filament_color"
     t.string "pickup_location"
     t.string "category"
-    t.string "print_type", default: "FDM", null: false
     t.integer "print_time_estimate"
     t.decimal "slicer_weight", precision: 10, scale: 2
     t.decimal "slicer_cost", precision: 10, scale: 2
@@ -78,6 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_011505) do
     t.boolean "spray_ok", default: false, null: false, comment: "Whether it’s OK to apply scanning spray/powder to the object"
     t.string "type", default: "PrintJob", null: false
     t.bigint "status_id", null: false
+    t.string "print_type_code"
     t.index ["assigned_printer_id"], name: "index_jobs_on_assigned_printer_id"
     t.index ["patron_id"], name: "index_jobs_on_patron_id"
     t.index ["status_id"], name: "index_jobs_on_status_id"
@@ -127,6 +127,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_011505) do
     t.index ["print_job_id"], name: "index_print_job_notes_on_print_job_id"
   end
 
+  create_table "print_types", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_print_types_on_code", unique: true
+  end
+
   create_table "printers", force: :cascade do |t|
     t.string "name", null: false
     t.string "printer_type"
@@ -136,6 +145,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_011505) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "pickup_location_id"
+    t.string "print_type_code"
     t.index ["name"], name: "index_printers_on_name", unique: true
     t.index ["pickup_location_id"], name: "index_printers_on_pickup_location_id"
   end

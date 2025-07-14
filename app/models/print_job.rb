@@ -9,12 +9,14 @@ class PrintJob < Job
   has_one_attached :model_file
 
   JOB_CATEGORIES = %w[Patron Staff Assistive\ Aid Fidget Scan].freeze
-  PRINT_TYPES    = %w[FDM Resin Scan].freeze
 
   validates :category,   inclusion: { in: JOB_CATEGORIES }
-  validates :print_type, inclusion: { in: PRINT_TYPES }
 
   validates :status, presence: true
+
+  validates :print_type_code,
+            presence: true,
+            inclusion: { in: -> { PrintType.pluck(:code) } }
 
   validates :url,
             format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]),
