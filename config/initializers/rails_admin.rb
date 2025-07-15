@@ -2,6 +2,7 @@
 require Rails.root.join('lib/rails_admin/config/actions/conversation')
 
 RailsAdmin.config do |config|
+  config.authorize_with :cancancan, Ability
   # ─ Authentication & inheritance ───────────────────────
   config.parent_controller      = '::ApplicationController'
   config.authenticate_with do
@@ -36,11 +37,18 @@ RailsAdmin.config do |config|
     export
     bulk_delete
     show
-    edit
 
     # custom Conversation button on Jobs
     conversation do
       only ['Job']
+    end
+
+    edit do
+      visible do
+        # admins can edit anything; non-admins can edit everything *except* Patron
+        bindings[:controller].current_staff_user.admin? ||
+          bindings[:abstract_model].model != Patron
+      end
     end
 
     delete do
@@ -106,7 +114,21 @@ RailsAdmin.config do |config|
           filterable     true
           associated_collection_scope { ->(scope){ scope.order(:position) } }
         end
-        field :model_file, :active_storage
+        field :model_file, :active_storage do
+          label 'Model File'
+          pretty_value do
+            attachment = bindings[:object].model_file
+            if attachment.attached?
+              blob = attachment.blob
+              # Link to download the file, showing the original filename
+              bindings[:view].link_to \
+                blob.filename.to_s,
+                Rails.application.routes.url_helpers.rails_blob_path(attachment, disposition: 'attachment', only_path: true)
+            else
+              bindings[:view].content_tag(:em, 'No file uploaded')
+            end
+          end
+        end
         field :url
         field :filament_color
         field :print_time_estimate
@@ -183,7 +205,21 @@ RailsAdmin.config do |config|
           inline_edit                   false
           associated_collection_scope   { ->(scope){ scope.order(:position) } }
         end
-        field :model_file, :active_storage
+        field :model_file, :active_storage do
+          label 'Model File'
+          pretty_value do
+            attachment = bindings[:object].model_file
+            if attachment.attached?
+              blob = attachment.blob
+              # Link to download the file, showing the original filename
+              bindings[:view].link_to \
+                blob.filename.to_s,
+                Rails.application.routes.url_helpers.rails_blob_path(attachment, disposition: 'attachment', only_path: true)
+            else
+              bindings[:view].content_tag(:em, 'No file uploaded')
+            end
+          end
+        end
         field :url
         field :filament_color, :enum do
           enum          { FilamentColor.order(:name).pluck(:name, :code) }
@@ -392,6 +428,42 @@ RailsAdmin.config do |config|
     navigation_label 'Admin'
     weight           330
     label_plural     'Patrons'
+    object_label_method :name
+
+    # ─── SHOW ───────────────────────────────────────────────
+    show do
+      include_all_fields
+
+      # Only admins see everything. Non-admins see just name, email, jobs:
+      fields.each do |field|
+        field.visible do
+          bindings[:controller].current_staff_user.admin? ||
+            [:name, :email, :jobs].include?(field.name)
+        end
+      end
+
+      # Render the jobs association as links back to each job’s show
+      field :jobs, :has_many_association do
+        pretty_value do
+          bindings[:object].jobs.map do |job|
+            bindings[:view].link_to(
+              "##{job.id} (#{job.type.demodulize})",
+              bindings[:view].rails_admin.show_path(
+                model_name: 'job',
+                id:         job.id
+              )
+            )
+          end.join(', ').html_safe
+        end
+      end
+    end
+
+    list do
+      field :id
+      field :email
+      field :name
+      field :jobs
+    end
   end
 
   config.model 'Status' do
