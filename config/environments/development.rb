@@ -42,7 +42,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("DEV_HOST", "localhost"),
+    host: ENV.fetch("DEV_HOST", "aurora.lib.tadl.org"),
     port: ENV.fetch("DEV_PORT", 3000)
   }
 
