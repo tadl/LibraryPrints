@@ -49,7 +49,6 @@ class PortalController < ApplicationController
 
   def create_scan_job
     @patron = find_or_create_patron
-
     @job    = ScanJob.new(scan_job_params)
     @job.patron   = @patron
     @job.category = Category.find_by!(name: 'Patron')
@@ -158,27 +157,38 @@ class PortalController < ApplicationController
     )
   end
 
+  # Load or authenticate the patron, handling ?token=… for both dashboard and show
   def load_patron
-    if cookies.encrypted[:patron_id].present?
-      @patron = Patron.find_by(id: cookies.encrypted[:patron_id])
-      head :unauthorized and return unless @patron&.token_valid?
-
-    elsif params[:token].present?
+    if params[:token].present?
+      # 1) find by token, validate, set cookie…
       @patron = Patron.find_by(access_token: params[:token])
-      head :unauthorized and return unless @patron&.token_valid?
+      unless @patron&.token_valid?
+        return redirect_to login_path
+      end
 
-      # set the cookie for future requests
       cookies.encrypted[:patron_id] = {
         value:    @patron.id,
         httponly: true,
         expires:  4.hours.from_now
       }
 
-      # now redirect off of the token‐bearing URL
-      redirect_to dashboard_path and return
+      # 2) redirect to the clean URL
+      if action_name == 'dashboard'
+        return redirect_to dashboard_path
+      else
+        return redirect_to job_path(params[:id])
+      end
+
+    elsif cookies.encrypted[:patron_id].present?
+      # cookie-only flow
+      @patron = Patron.find_by(id: cookies.encrypted[:patron_id])
+      unless @patron&.token_valid?
+        return redirect_to login_path
+      end
 
     else
-      head :unauthorized and return
+      # no token, no cookie → ask them to log in
+      return redirect_to login_path
     end
   end
 

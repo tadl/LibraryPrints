@@ -6,7 +6,6 @@ class JobMailer < ApplicationMailer
     @job          = @conversation.job
     @patron       = @job.patron
 
-    # build patron‐facing link
     @url = job_url(@job, token: @patron.access_token)
 
     # use the conversation’s conversation_token for plus‐addressing

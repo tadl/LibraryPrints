@@ -1,10 +1,31 @@
-# app/views/patron_mailer/access_link.html.erb
-<p>Hello <%= @patron.name %>,</p>
+<!-- app/views/patron_mailer/access_link.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    /* tweak inline styles as you like */
+    .btn {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff !important;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <p>Hello <%= @patron.name %>,</p>
 
-<p>Thanks for submitting a 3D print request. You can view your job status (and submit new ones) by clicking the link below:</p>
+  <p>Thanks for your request! You can view your job status (or submit new ones) by clicking the button below: We will reach out shortly with estimates for cost and time to complete.</p>
 
-<p>
-  <%= link_to "View your print jobs", dashboard_url(token: @patron.access_token) %>
-</p>
+  <p>
+    <a href="<%= @url %>" class="btn">
+      View your dashboard
+    </a>
+  </p>
 
-<p>— Your TADL Makerspace</p>
+  <p>— Your TADL Makerspace</p>
+</body>
+</html>

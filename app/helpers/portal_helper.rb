@@ -14,4 +14,12 @@ module PortalHelper
 
     content_tag :span, status.name, class: "badge #{klass} px-3 py-2"
   end
+
+  def author_display_name(author)
+    if author.is_a?(StaffUser)
+      author.name.split(/\s+/).first
+    else
+      author.name
+    end
+  end
 end

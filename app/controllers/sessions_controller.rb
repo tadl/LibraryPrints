@@ -16,12 +16,12 @@ class SessionsController < ApplicationController
       redirect_to root_path, notice: "Staff user signed out."
 
     elsif cookies.encrypted[:patron_id]
-      # expire the Patron’s token so the magic-link can’t be reused
+      # rotate the Patron’s token so the magic-link can’t be reused
       if (patron = Patron.find_by(id: cookies.encrypted[:patron_id]))
-        patron.expire_token!
+        patron.regenerate_access_token!
       end
 
-      cookies.delete(:patron_id)
+      cookies.encrypted[:patron_id] = { value: nil, expires: 1.second.ago, httponly: true }
       reset_session
       redirect_to root_path, notice: "You’ve been logged out."
 
