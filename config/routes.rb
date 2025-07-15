@@ -37,5 +37,8 @@ Rails.application.routes.draw do
 
   # Health check endpoint
   get '/up', to: 'rails/health#show', as: :rails_health_check
+
+  # Inbound mailgun webhooks
+  post  '/inbound/mailgun', to: 'inbound#mailgun'
 end
 
