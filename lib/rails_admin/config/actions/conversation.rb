@@ -8,6 +8,7 @@ module RailsAdmin
       class Conversation < Base
         RailsAdmin::Config::Actions.register(self)
 
+        # this is a member-only action
         register_instance_option :member do
           true
         end
@@ -24,6 +25,7 @@ module RailsAdmin
           [:get, :post]
         end
 
+        # the URL will be /admin/job/:id/conversation
         register_instance_option :route_fragment do
           'conversation'
         end
@@ -37,7 +39,18 @@ module RailsAdmin
             @job          = @abstract_model.model.find(params[:id])
             @conversation = @job.conversation || @job.build_conversation
 
-            if request.post?
+            if request.get?
+              # ==== MARK PATRON MESSAGES READ ====
+              # for each unread message NOT authored by staff, stamp read_at
+              @conversation.messages.unread.find_each do |msg|
+                msg.update_read_at!
+              end
+
+              # now render the blank conversation view
+              render @action.template_name
+
+            elsif request.post?
+              # ==== STAFF POST ====
               body            = params.dig(:conversation, :message_body)
               staff_only_flag = params.dig(:conversation, :staff_note_only) == '1'
 
@@ -73,8 +86,6 @@ module RailsAdmin
                             conversation: @conversation }
                 )
               ]
-            else
-              render @action.template_name
             end
           end
         end

@@ -13,7 +13,7 @@ RailsAdmin.config do |config|
   config.default_items_per_page = 10
 
   # ─ App name & included models ────────────────────────
-  config.main_app_name   = ['Library Prints', 'Admin']
+  config.main_app_name   = ['MAKE', 'Things at TADL']
   config.included_models = %w[
     StaffUser
     Patron

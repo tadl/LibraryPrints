@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_14_203631) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_15_114547) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -99,8 +99,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_14_203631) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "staff_note_only", default: false, null: false
+    t.datetime "read_at"
     t.index ["author_type", "author_id"], name: "index_messages_on_author"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["read_at"], name: "index_messages_on_read_at"
   end
 
   create_table "patrons", force: :cascade do |t|
