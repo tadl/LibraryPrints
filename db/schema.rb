@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_15_114547) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_15_165455) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_114547) do
     t.bigint "job_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "conversation_token"
+    t.index ["conversation_token"], name: "index_conversations_on_conversation_token", unique: true
     t.index ["job_id"], name: "index_conversations_on_job_id"
   end
 

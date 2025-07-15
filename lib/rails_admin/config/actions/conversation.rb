@@ -69,7 +69,7 @@ module RailsAdmin
 
               # only email patron when not a staff-only note
               unless staff_only_flag
-                JobMailer.with(message: msg).notify_patron.deliver_later
+                JobMailer.notify_patron(msg).deliver_later
               end
 
               # Turbo-stream replace the messages list and reset the form

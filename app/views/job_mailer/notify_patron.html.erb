@@ -3,22 +3,26 @@
 <head>
   <meta charset="utf-8">
   <style>
-    /* inline styles if you like */
+    /* you can inline your styles here */
   </style>
 </head>
 <body>
-  <p>Hello <%= @job.patron.name %>,</p>
+  <p>Hello <%= @patron.name %>,</p>
 
-  <p>You’ve got a new message about your <%= @job.is_a?(PrintJob) ? "print" : "scan" %> job #<%= @job.id %>:</p>
+  <p>
+    You’ve got a new message about your
+    <%= @job.is_a?(PrintJob) ? "print" : "scan" %> job
+    <strong>#<%= @job.id %></strong>:
+  </p>
 
-  <blockquote>
+  <blockquote style="border-left: 4px solid #ccc; padding-left: 1rem; color: #555;">
     <%= simple_format(@message.body) %>
   </blockquote>
 
   <p>
     You can reply or view the full conversation here:<br>
-    <a href="<%= rails_admin.show_path(model_name: 'job', id: @job.id) %>">
-      View conversation in the admin
+    <a href="<%= @portal_link %>" style="display: inline-block; background: #2563eb; color: #fff; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px;">
+      View your conversation
     </a>
   </p>
 

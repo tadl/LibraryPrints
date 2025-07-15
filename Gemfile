@@ -78,6 +78,7 @@ gem 'letter_opener', group: :development
 gem 'sassc-rails'
 
 gem 'mailgun-ruby', '~> 1.3', '>= 1.3.7'
+gem 'mailgun_rails'
 # load .env in development & test
 gem 'dotenv-rails', groups: [:development, :test]
 
