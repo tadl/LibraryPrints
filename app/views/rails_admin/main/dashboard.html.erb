@@ -1,0 +1,60 @@
+<%# app/views/rails_admin/main/dashboard.html.erb %>
+<% statuses = Status.order(:position) %>
+
+<div class="container py-4">
+  <h1 class="mb-4">Admin Dashboard</h1>
+
+  <div class="row g-3 mb-5">
+    <% statuses.each do |status| %>
+      <% count = Job.with_status(status.code).count %>
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <%= link_to(
+              rails_admin.index_path(
+                model_name: 'job',
+                f: { status: { status.id.to_s => { o: 'is', v: status.name } } }
+              ),
+              class: "card h-100 text-decoration-none #{'border-primary' if count.positive?}"
+            ) do %>
+          <div class="card-body text-center">
+            <h5 class="card-title"><%= status.name %></h5>
+            <p class="display-6 mb-0"><%= count %></p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <h2 class="mb-3">Quick Actions</h2>
+  <div class="btn-group mb-5" role="group" aria-label="Quick filters">
+    <% statuses.each do |status| %>
+      <% count = Job.with_status(status.code).count %>
+      <%= link_to "#{status.name} (#{count})",
+            rails_admin.index_path(
+              model_name: 'job',
+              f: { status: { status.id.to_s => { o: 'is', v: status.name } } }
+            ),
+            class: "btn btn-outline-primary#{' active' if count.positive?}" %>
+    <% end %>
+  </div>
+
+  <h2 class="mb-3">Messages</h2>
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-info h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">Total Messages</h5>
+          <p class="display-6 mb-0"><%= Message.count %></p>
+        </div>
+        <div class="card-footer text-center">
+          <%= link_to "View All Messages",
+                      rails_admin.index_path(model_name: 'message'),
+                      class: "card-link" %>
+        </div>
+      </div>
+    </div>
+
+    <%# Later, if you add an `unread` boolean to Message, you can do:
+        unread = Message.where(unread: true).count
+        and render a second card here. %>
+  </div>
+</div>
