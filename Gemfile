@@ -77,9 +77,11 @@ gem 'letter_opener', group: :development
 # For SCSS/CSS processing in the asset pipeline
 gem 'sassc-rails'
 
+gem 'mailgun-ruby', '~> 1.3', '>= 1.3.7'
 # load .env in development & test
 gem 'dotenv-rails', groups: [:development, :test]
 
 gem 'bootstrap', '~> 5.3'
 
 gem 'recaptcha', require: 'recaptcha/rails'
+

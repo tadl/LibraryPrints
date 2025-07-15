@@ -5,8 +5,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     ENV.fetch('GOOGLE_CLIENT_ID'),
     ENV.fetch('GOOGLE_CLIENT_SECRET'),
     {
-      hd:    'tadl.org',
-      scope: 'email,profile',
+      hd:     ENV.fetch('GOOGLE_DOMAIN'),
+      scope:  'email,profile',
       prompt: 'select_account'
     }
 end
