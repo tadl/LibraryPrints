@@ -2,8 +2,6 @@
 <% statuses = Status.order(:position) %>
 
 <div class="container py-4">
-  <h1 class="mb-4">Admin Dashboard</h1>
-
   <div class="row g-3 mb-5">
     <% statuses.each do |status| %>
       <% count = Job.with_status(status.code).count %>
@@ -24,7 +22,6 @@
     <% end %>
   </div>
 
-  <h2 class="mb-3">Unread Messages</h2>
   <% unread_by_job = Message.unread.joins(conversation: :job)
                          .select('jobs.id as job_id, jobs.patron_id, COUNT(messages.*) as cnt')
                          .group('jobs.id') %>
@@ -32,7 +29,7 @@
   <% if unread_by_job.any? %>
     <div class="card mb-4">
       <div class="card-header">
-        <i class="bi bi-chat-dots"></i> Unread Customer Messages
+        <i class="bi bi-chat-dots"></i> <strong>Unread Messages</strong>
       </div>
       <ul class="list-group list-group-flush">
         <% unread_by_job.each do |row| %>
@@ -49,6 +46,13 @@
           </li>
         <% end %>
       </ul>
+    </div>
+  <% else %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-chat-dots"></i> <strong>No Unread Messages</strong>
+      </div>
+      <h3 class="m-3">Hooray!</h3>
     </div>
   <% end %>
 
