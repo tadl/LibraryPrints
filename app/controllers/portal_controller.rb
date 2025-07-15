@@ -20,12 +20,17 @@ class PortalController < ApplicationController
 
   def create_print_job
     @patron = find_or_create_patron
-    send_magic_link
-
-    @job = PrintJob.new(print_job_params)
+    @job    = PrintJob.new(print_job_params)
     @job.patron   = @patron
     @job.category = Category.find_by!(name: 'Patron')
     @job.status   = Status.find_by!(code: 'pending')
+
+    unless verify_recaptcha(model: @job)
+      flash.now[:alert] = @job.errors.full_messages.to_sentence
+      return render :submit_print, status: :unprocessable_entity
+    end
+
+    send_magic_link
 
     if @job.save
       redirect_to thank_you_path(kind: 'print')
@@ -44,13 +49,18 @@ class PortalController < ApplicationController
 
   def create_scan_job
     @patron = find_or_create_patron
-    send_magic_link
 
-    # build a ScanJob directly so attachments and STI behave
-    @job = ScanJob.new(scan_job_params)
+    @job    = ScanJob.new(scan_job_params)
     @job.patron   = @patron
     @job.category = Category.find_by!(name: 'Patron')
     @job.status   = Status.find_by!(code: 'pending')
+
+    unless verify_recaptcha(model: @job)
+      flash.now[:alert] = @job.errors.full_messages.to_sentence
+      return render :submit_scan, status: :unprocessable_entity
+    end
+
+    send_magic_link
 
     if @job.save
       redirect_to thank_you_path(kind: 'scan')

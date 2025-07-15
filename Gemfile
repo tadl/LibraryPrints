@@ -81,3 +81,5 @@ gem 'sassc-rails'
 gem 'dotenv-rails', groups: [:development, :test]
 
 gem 'bootstrap', '~> 5.3'
+
+gem 'recaptcha', require: 'recaptcha/rails'

@@ -120,12 +120,11 @@
         <h4 class="mb-0">CAPTCHA</h4>
       </div>
       <div class="card-body">
-        <%= label_tag 'captcha', 'Enter any word to help prevent spam:', class: 'form-label' %>
-        <%= text_field_tag 'captcha',
-              nil,
-              id: 'captcha_field',
-              class: 'form-control',
-              required: true %>
+        <%= recaptcha_tags %>
+        <% if @job.errors[:recaptcha].present? %>
+          <div class="text-danger small mt-1"><%= @job.errors[:recaptcha].join(", ") %></div>
+        <% end %>
+        <span class="help-text">This question is for testing whether or not you are a human visitor and to prevent automated spam submissions.</span>
       </div>
     </div>
 
