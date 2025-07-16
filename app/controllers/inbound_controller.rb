@@ -1,5 +1,7 @@
 # app/controllers/inbound_controller.rb
 class InboundController < ActionController::API
+  require 'email_reply_parser'
+
   # pull in the Rails CSRF protection callbacks
   include ActionController::RequestForgeryProtection
 
@@ -11,9 +13,10 @@ class InboundController < ActionController::API
 
   # POST /inbound/mailgun
   def mailgun
-    recipient   = params[:recipient]        # e.g. "make+TOKEN@make.tadl.org"
-    body        = params['body-plain']      # plain-text part of the email
-    from_header = params[:from]             # e.g. "Alice <alice@example.com>"
+    recipient   = params[:recipient]
+    raw_body    = params['body-plain']
+    from_header = params[:from]
+    cleaned     = EmailReplyParser.parse_reply(raw_body)
 
     # 1) extract conversation token
     token = recipient[/\Amake\+([^@]+)@/, 1]
@@ -37,7 +40,7 @@ class InboundController < ActionController::API
 
     # 5) build the inbound message
     conversation.messages.create!(
-      body:        body,
+      body:        cleaned,
       author:      patron
     )
 

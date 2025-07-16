@@ -71,14 +71,13 @@ gem 'rails_admin'
 # optional for authorization inside RailsAdmin
 gem 'cancancan'
 
-# mailer previews & nicer emails
-gem 'letter_opener', group: :development
-
 # For SCSS/CSS processing in the asset pipeline
 gem 'sassc-rails'
 
 gem 'mailgun-ruby', '~> 1.3', '>= 1.3.7'
 gem 'mailgun_rails'
+gem 'email_reply_parser'
+
 # load .env in development & test
 gem 'dotenv-rails', groups: [:development, :test]
 
