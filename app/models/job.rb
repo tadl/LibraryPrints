@@ -13,6 +13,8 @@ class Job < ApplicationRecord
              foreign_key: :print_type_code,
              optional:   true
 
+  belongs_to :printable_model, optional: true
+
   has_one_attached :model_file
 
   has_one  :conversation, dependent: :destroy

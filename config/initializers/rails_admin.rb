@@ -27,6 +27,7 @@ RailsAdmin.config do |config|
     Category
     Conversation
     Message
+    PrintableModel
   ]
 
   # ─ Actions ────────────────────────────────────────────
@@ -35,7 +36,9 @@ RailsAdmin.config do |config|
     index                         # mandatory
     new   { except ['StaffUser'] }
     export
-    bulk_delete
+    bulk_delete do
+      visible { bindings[:controller].current_staff_user.admin? }
+    end
     show
 
     # custom Conversation button on Jobs
@@ -52,7 +55,7 @@ RailsAdmin.config do |config|
     end
 
     delete do
-      only ['Message', 'FilamentColor', 'Status']
+      only ['Message', 'FilamentColor', 'Status', 'Category', 'PrintableModel']
       visible { bindings[:controller].current_staff_user.admin? }
     end
   end
@@ -274,10 +277,42 @@ RailsAdmin.config do |config|
     end
   end
 
-  config.model 'PickupLocation' do
+  config.model 'PrintableModel' do
     visible          { bindings[:controller].current_staff_user.admin? }
     navigation_label 'Form Options'
     weight           210
+    label_plural     'Printable Models'
+
+    list do
+      sort_by :name
+      field :name
+      field :code
+      field :category
+    end
+
+    edit do
+      field :name
+      field :code
+      field :position
+      field :category
+      field :notes
+
+      field :model_file, :active_storage do
+        label 'Model File (STL)'
+        help  'Attach the .stl file for this model'
+      end
+
+      field :preview_image , :active_storage do
+        label 'Photo'
+        help  'Attach a PNG/JPG preview for this model'
+      end
+    end
+  end
+
+  config.model 'PickupLocation' do
+    visible          { bindings[:controller].current_staff_user.admin? }
+    navigation_label 'Form Options'
+    weight           220
     label_plural     'Pickup Locations'
 
     list do

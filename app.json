@@ -1,5 +1,5 @@
 {
-    "name": "LibraryPrints",
+    "name": "MAKEatTADL",
     "env": {
         "RAILS_SERVE_STATIC_FILES": { "value": "enabled" },
         "RAILS_LOG_TO_STDOUT": { "value": "true" },
@@ -28,4 +28,3 @@
         { "url": "heroku/ruby" }
     ]
 }
-

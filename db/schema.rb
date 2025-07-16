@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_15_165455) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_16_213246) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -87,9 +87,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_165455) do
     t.bigint "status_id", null: false
     t.string "print_type_code"
     t.bigint "category_id", null: false
+    t.bigint "printable_model_id"
     t.index ["assigned_printer_id"], name: "index_jobs_on_assigned_printer_id"
     t.index ["category_id"], name: "index_jobs_on_category_id"
     t.index ["patron_id"], name: "index_jobs_on_patron_id"
+    t.index ["printable_model_id"], name: "index_jobs_on_printable_model_id"
     t.index ["status_id"], name: "index_jobs_on_status_id"
   end
 
@@ -148,6 +150,17 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_165455) do
     t.index ["code"], name: "index_print_types_on_code", unique: true
   end
 
+  create_table "printable_models", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.integer "position"
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "notes"
+    t.index ["category_id"], name: "index_printable_models_on_category_id"
+  end
+
   create_table "printers", force: :cascade do |t|
     t.string "name", null: false
     t.string "printer_type"
@@ -194,9 +207,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_165455) do
   add_foreign_key "conversations", "jobs"
   add_foreign_key "jobs", "categories"
   add_foreign_key "jobs", "patrons"
+  add_foreign_key "jobs", "printable_models"
   add_foreign_key "jobs", "printers", column: "assigned_printer_id"
   add_foreign_key "jobs", "statuses"
   add_foreign_key "messages", "conversations"
   add_foreign_key "print_job_notes", "jobs", column: "print_job_id"
+  add_foreign_key "printable_models", "categories"
   add_foreign_key "printers", "pickup_locations"
 end

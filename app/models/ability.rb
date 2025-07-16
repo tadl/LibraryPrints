@@ -28,7 +28,8 @@ class Ability
         PrintType,
         FilamentColor,
         PickupLocation,
-        Patron
+        Patron,
+        PrintableModel
       ]
 
       # Disallow destructive on jobs

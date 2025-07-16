@@ -40,7 +40,7 @@ end
 categories = [
   { name: 'Patron',        position: 1 },
   { name: 'Staff',         position: 2 },
-  { name: 'Assistive Aid', position: 3 },
+  { name: 'Assistive',     position: 3 },
   { name: 'Fidget',        position: 4 },
 ]
 
@@ -51,4 +51,23 @@ categories.each do |attrs|
     cat.position = attrs[:position]
     cat.save!
   end
+end
+
+printablemodels = [
+  ["Calming Comb",       "calming_comb",       "Fidget"],
+  ["Concentric Flower",  "concentric_flower",  "Fidget"],
+  ["Fidget Spinner",     "fidget_spinner",     "Fidget"],
+  ["Key Turner",         "key_turner",         "Assistive"],
+  ["Button Aid",         "button_aid",         "Assistive"],
+  ["Cup Holder",         "cup_holder",         "Assistive"]
+]
+
+printablemodels.each_with_index do |(name, code, category_name), position|
+  category = Category.find_by!(name: category_name)
+
+  model = PrintableModel.find_or_initialize_by(code: code)
+  model.name     = name
+  model.category = category
+  model.position = position
+  model.save!
 end

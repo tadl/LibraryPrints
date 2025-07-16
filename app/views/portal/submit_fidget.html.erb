@@ -1,0 +1,158 @@
+<!-- app/views/portal/submit_fidget.html.erb -->
+<main class="container my-5">
+  <h1 class="mb-4">Free 3D Fidgets Request for Local IBCCES Partners</h1>
+  <p class="help-text">You are welcome to request up to ONE (1) free 3D printed fidget devices per month. You will be notified via email when your items are ready to pick up.  Please note that your request will be put in the queue with other patrons requests. It can take up to 2 weeks to be notified your devices are ready for pick up.</p>
+
+
+  <%= form_tag submit_fidget_path, multipart: true, local: true do %>
+
+    <!-- Name -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">Name</h4>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <%= label_tag 'patron[first_name]', 'First Name', class: 'form-label' %>
+            <%= text_field_tag 'patron[first_name]',
+                  params.dig(:patron, :first_name),
+                  id: 'patron_first_name',
+                  class: 'form-control',
+                  required: true %>
+          </div>
+          <div class="col-md-6">
+            <%= label_tag 'patron[last_name]', 'Last Name', class: 'form-label' %>
+            <%= text_field_tag 'patron[last_name]',
+                  params.dig(:patron, :last_name),
+                  id: 'patron_last_name',
+                  class: 'form-control',
+                  required: true %>
+          </div>
+        </div>
+        <div class="mt-3">
+          <%= label_tag 'patron[email]', 'Email Address', class: 'form-label' %>
+          <%= email_field_tag 'patron[email]',
+                params.dig(:patron, :email),
+                id: 'patron_email',
+                class: 'form-control',
+                required: true %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">Model</h4>
+      </div>
+      <div class="card-body">
+        <% fidget_category = Category.find_by!(name: 'Fidget') %>
+        <div class="d-flex flex-wrap">
+          <% fidget_category.printable_models.order(:position).each do |pm| %>
+            <div class="form-check me-4 mb-4">
+              <%= radio_button_tag 'job[printable_model_id]',
+                    pm.id,
+                    params.dig(:job, :printable_model_id).to_s == pm.id.to_s,
+                    id: "job_printable_model_#{pm.code}",
+                    class: 'form-check-input',
+                    required: true %>
+              <%= label_tag "job_printable_model_#{pm.code}",
+                    pm.name,
+                    class: 'form-check-label d-block' %>
+              <% if pm.preview_image.attached? %>
+                <%= image_tag pm.preview_image.variant(resize_to_limit: [100, 100]),
+                      alt: pm.name,
+                      class: 'img-thumbnail mt-2' %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">Color</h4>
+      </div>
+      <div class="card-body">
+        <%= label_tag 'job[filament_color]', 'Choose a Color', class: 'form-label' %>
+        <%= select_tag 'job[filament_color]',
+              options_from_collection_for_select(
+                FilamentColor.all.order(:position),
+                :code, :name,
+                params.dig(:job, :filament_color)
+              ),
+              include_blank: 'Select color',
+              id: 'job_filament_color',
+              class: 'form-select',
+              required: true %>
+      </div>
+    </div>
+
+    <!-- Company/Organization Name -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">Company/Organization Name</h4>
+      </div>
+      <div class="card-body">
+        <%= label_tag 'job[notes]', 'Company/Organization Name', class: 'form-label' %>
+        <%= text_area_tag 'job[notes]',
+              params.dig(:job, :notes),
+              id: 'job_notes',
+              rows: 4,
+              placeholder: 'Your company or organization…',
+              class: 'form-control' %>
+      </div>
+    </div>
+
+    <!-- Pickup Location -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">Pickup Location</h4>
+      </div>
+      <div class="card-body">
+        <%= label_tag 'job[pickup_location]', 'Where will you pick up your print?', class: 'form-label' %>
+        <%= select_tag 'job[pickup_location]',
+              options_for_select(
+                PickupLocation.active.order(:position).pluck(:name, :code),
+                params.dig(:job, :pickup_location) || 'wood'
+              ),
+              id: 'job_pickup_location',
+              class: 'form-select',
+              required: true %>
+        <span class="help-text">
+          We will try to print your object at your pickup library. Only locations with active printers are available.
+        </span>
+      </div>
+    </div>
+
+    <!-- CAPTCHA -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">CAPTCHA</h4>
+      </div>
+      <div class="card-body">
+        <%= recaptcha_tags %>
+        <% if @job&.errors&.[](:recaptcha).present? %>
+          <div class="text-danger small mt-1">
+            <%= @job.errors[:recaptcha].join(", ") %>
+          </div>
+        <% end %>
+        <span class="help-text">
+          This question is for testing whether or not you are a human visitor and to prevent spam.
+        </span>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="text-end">
+      <%= submit_tag 'Submit Fidget Request', class: 'btn btn-primary btn-lg' %>
+    </div>
+
+    <p class="form-text text-muted mt-4">
+      After receiving your submission, we'll get back to you within 48 hours (usually much sooner) with details on print time, filament usage, cost, or any questions we have.
+    </p>
+  <% end %>
+</main>

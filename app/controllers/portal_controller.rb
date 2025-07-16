@@ -12,31 +12,66 @@ class PortalController < ApplicationController
   end
 
   #
-  # PRINT JOB
+  # PRINT/FIDGET/ASSISTIVE FORM
   #
   def submit_print
-    @job = PrintJob.new
+    @type = params[:type] || 'patron'
+    @job  = PrintJob.new
+
+    if @type.in?(%w[fidget assistive])
+      # load only the models for this category
+      @printable_models = PrintableModel
+        .joins(:category)
+        .where(categories: { name: @type.capitalize })
+        .order(:position)
+
+      # render the matching template (submit_fidget or submit_assistive)
+      return render :"submit_#{@type}"
+    end
+
+    # default “patron” flow
+    render :submit_print
   end
 
+  #
+  # SAVE ANY TYPE OF PRINT JOB
+  #
+  #
+  # SAVE ANY TYPE OF PRINT JOB
+  #
   def create_print_job
     @patron = find_or_create_patron
     @job    = PrintJob.new(print_job_params)
-    @job.patron   = @patron
-    @job.category = Category.find_by!(name: 'Patron')
+    @job.patron = @patron
+
+    if params[:type].in?(%w[fidget assistive])
+      @job.print_type = PrintType.find_by!(code: 'fdm')
+
+      # associate the selected PrintableModel and copy its STL
+      if (pm_id = params.dig(:job, :printable_model_id)).present?
+        pm = PrintableModel.find(pm_id)
+        @job.printable_model = pm
+        @job.model_file.attach(pm.model_file.blob) if pm.model_file.attached?
+      end
+    end
+
+    @job.category = Category.find_by!(name: params[:type].to_s.capitalize)
     @job.status   = Status.find_by!(code: 'pending')
 
     unless verify_recaptcha(model: @job)
       flash.now[:alert] = @job.errors.full_messages.to_sentence
-      return render :submit_print, status: :unprocessable_entity
+      template = params[:type] == 'fidget' ? :submit_fidget : :submit_print
+      return render template, status: :unprocessable_entity
     end
 
     send_magic_link
 
     if @job.save
-      redirect_to thank_you_path(kind: 'print')
+      redirect_to thank_you_path(kind: params[:type])
     else
       flash.now[:alert] = @job.errors.full_messages.to_sentence
-      render :submit_print, status: :unprocessable_entity
+      template = params[:type] == 'fidget' ? :submit_fidget : :submit_print
+      render template, status: :unprocessable_entity
     end
   end
 
@@ -196,4 +231,20 @@ class PortalController < ApplicationController
   def load_job
     @job = @patron.jobs.find(params[:id])
   end
+
+  def print_job_params
+    params.require(:job).permit(
+      # regular-print fields
+      :model_file,
+      :url,
+      # shared
+      :filament_color,
+      :notes,
+      :pickup_location,
+      # fidget-only
+      :printable_model_id,
+      :print_type
+    )
+  end
+
 end

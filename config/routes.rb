@@ -17,11 +17,26 @@ Rails.application.routes.draw do
   root to: 'portal#home'
 
   # 3D print & scan request submission
-  get  '/submit-print', to: 'portal#submit_print',      as: :submit_print
-  post '/submit-print', to: 'portal#create_print_job',  as: :create_print_job
+  # “Regular” 3D prints (patron‐type)
+  scope defaults: { type: 'patron' } do
+    get  '/submit-print', to: 'portal#submit_print',   as: :submit_print
+    post '/submit-print', to: 'portal#create_print_job', as: :create_print_job
+  end
 
-  get  '/submit-scan',  to: 'portal#submit_scan',       as: :submit_scan
-  post '/submit-scan',  to: 'portal#create_scan_job',   as: :create_scan_job
+  # “Fidget” prints (fidget‐type)
+  scope defaults: { type: 'fidget' } do
+    get  '/submit-fidget', to: 'portal#submit_print',   as: :submit_fidget
+    post '/submit-fidget', to: 'portal#create_print_job', as: :create_fidget_job
+  end
+
+  # "Assistive" prints (assistive-type)
+  scope defaults: { type: 'assistive' } do
+    get '/submit-assistive', to: 'portal#submit_print', as: :submit_assistive
+    post '/submit-assistive', to: 'portal#create_print_job', as: :create_assistive_job
+  end
+
+  get  '/submit-scan',    to: 'portal#submit_scan',       as: :submit_scan
+  post '/submit-scan',    to: 'portal#create_scan_job',   as: :create_scan_job
 
   get '/thank-you',      to: 'portal#thank_you',        as: :thank_you
 
