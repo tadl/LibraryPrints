@@ -1,11 +1,12 @@
+# app/mailers/application_mailer.rb
 class ApplicationMailer < ActionMailer::Base
-  default from:     "make@make.tadl.org"
-  default reply_to: "make@make.tadl.org"
+  MAIL_DOMAIN = ENV.fetch("MAILGUN_DOMAIN")
+
+  default from:     "TADL Makerspace <make@#{MAIL_DOMAIN}>"
+  default reply_to: "TADL Makerspace <make@#{MAIL_DOMAIN}>"
   layout "mailer"
 
-  private
-
-  def default_url_options
+  def self.default_url_options
     Rails.application.config.action_mailer.default_url_options
   end
 end
