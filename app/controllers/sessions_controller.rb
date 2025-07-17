@@ -1,8 +1,8 @@
 # app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
-  # -- your existing staff login logic stays untouched --
+  # Staff login via OmniAuth
   def create
-    auth = request.env['omniauth.auth']
+    auth  = request.env['omniauth.auth']
     staff = StaffUser.from_omniauth(auth)
     session[:staff_user_id] = staff.id
     redirect_to rails_admin.dashboard_path
@@ -10,25 +10,31 @@ class SessionsController < ApplicationController
 
   # DELETE /logout
   def destroy
-    if current_staff_user
-      session.delete(:staff_user_id)
-      reset_session
-      redirect_to root_path, notice: "Staff user signed out."
+    # remember what was logged in
+    staff_was_logged_in  = current_staff_user.present?
+    patron_was_logged_in = cookies.encrypted[:patron_id].present?
 
-    elsif cookies.encrypted[:patron_id]
-      # rotate the Patron’s token so the magic-link can’t be reused
+    # clear staff session
+    session.delete(:staff_user_id)
+
+    # expire patron token & clear its cookie
+    if patron_was_logged_in
       if (patron = Patron.find_by(id: cookies.encrypted[:patron_id]))
-        patron.regenerate_access_token!
+        patron.expire_token!
       end
-
-      cookies.encrypted[:patron_id] = { value: nil, expires: 1.second.ago, httponly: true }
-      reset_session
-      redirect_to root_path, notice: "You’ve been logged out."
-
-    else
-      reset_session
-      redirect_to root_path
+      cookies.delete(:patron_id)
     end
+
+    # wipe everything else
+    reset_session
+
+    # build notice
+    notices = []
+    notices << "Staff user signed out."   if staff_was_logged_in
+    notices << "You’ve been logged out."  if patron_was_logged_in
+    notices = ["Signed out."] if notices.empty?
+
+    redirect_to root_path, notice: notices.join(" ")
   end
 
   private

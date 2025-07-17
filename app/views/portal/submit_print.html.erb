@@ -2,7 +2,10 @@
 <main class="container my-5">
   <h1 class="mb-4">Request a 3D Print</h1>
 
-  <%= form_tag submit_print_path, multipart: true, local: true do %>
+  <%= form_tag submit_print_path,
+        multipart: true,
+        local: true,
+        data: { turbo: false } do %>
 
     <!-- Name -->
     <div class="card mb-4">

@@ -15,7 +15,7 @@ class PortalController < ApplicationController
   # PRINT/FIDGET/ASSISTIVE FORM
   #
   def submit_print
-    @type = params[:type] || 'patron'
+    @type = params[:type] || 'print'
     @job  = PrintJob.new
 
     if @type.in?(%w[fidget assistive])

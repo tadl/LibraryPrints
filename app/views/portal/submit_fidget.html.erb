@@ -3,8 +3,10 @@
   <h1 class="mb-4">Free 3D Fidgets Request for Local IBCCES Partners</h1>
   <p class="help-text">You are welcome to request up to ONE (1) free 3D printed fidget devices per month. You will be notified via email when your items are ready to pick up.  Please note that your request will be put in the queue with other patrons requests. It can take up to 2 weeks to be notified your devices are ready for pick up.</p>
 
-
-  <%= form_tag submit_fidget_path, multipart: true, local: true do %>
+  <%= form_tag submit_fidget_path,
+        multipart: true,
+        local: true,
+        data: { turbo: false } do %>
 
     <!-- Name -->
     <div class="card mb-4">
