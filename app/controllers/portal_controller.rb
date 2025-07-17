@@ -131,7 +131,7 @@ class PortalController < ApplicationController
 
   # Patron dashboard (list of all jobs)
   def dashboard
-    @jobs = @patron.jobs.order(created_at: :desc)
+    @jobs = @patron.jobs.order(created_at: :desc).page(params[:page]).per(10)
   end
 
   # Show a single job (and its messages)

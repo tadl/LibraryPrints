@@ -35,6 +35,9 @@
         <% end %>
       </tbody>
     </table>
+    <div class="mt-4">
+      <%= paginate @jobs %>
+    </div>
   <% else %>
     <div class="no-jobs text-center py-16">
       <p class="text-lg mb-4">You have no jobs yet.</p>
