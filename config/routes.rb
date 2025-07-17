@@ -35,6 +35,12 @@ Rails.application.routes.draw do
     post '/submit-assistive', to: 'portal#create_print_job', as: :create_assistive_job
   end
 
+  # "Staff" print requests
+  scope defaults: { type: 'staff' } do
+    get  '/submit-staff', to: 'portal#submit_print',   as: :submit_staff
+    post '/submit-staff', to: 'portal#create_print_job', as: :create_staff_job
+  end
+
   get  '/submit-scan',    to: 'portal#submit_scan',       as: :submit_scan
   post '/submit-scan',    to: 'portal#create_scan_job',   as: :create_scan_job
 

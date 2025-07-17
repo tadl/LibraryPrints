@@ -15,39 +15,43 @@ class PortalController < ApplicationController
   # PRINT/FIDGET/ASSISTIVE FORM
   #
   def submit_print
-    @type = params[:type] || 'print'
+    @type = params[:type]&.downcase.presence || 'patron'
     @job  = PrintJob.new
 
-    if @type.in?(%w[fidget assistive])
-      # load only the models for this category
+    if %w[fidget assistive].include?(@type)
       @printable_models = PrintableModel
         .joins(:category)
         .where(categories: { name: @type.capitalize })
         .order(:position)
 
-      # render the matching template (submit_fidget or submit_assistive)
       return render :"submit_#{@type}"
     end
 
-    # default “patron” flow
+    if @type == 'staff'
+      return render :submit_staff
+    end
+
     render :submit_print
   end
 
   #
   # SAVE ANY TYPE OF PRINT JOB
   #
-  #
-  # SAVE ANY TYPE OF PRINT JOB
-  #
   def create_print_job
+    @type   = params[:type]&.downcase.presence || 'patron'
     @patron = find_or_create_patron
     @job    = PrintJob.new(print_job_params)
     @job.patron = @patron
 
-    if params[:type].in?(%w[fidget assistive])
-      @job.print_type = PrintType.find_by!(code: 'fdm')
+    # STAFF‐ONLY: enforce @tadl.org email
+    if @type == 'staff' && !@patron.email.ends_with?('@tadl.org')
+      flash.now[:alert] = "Please use your work email for staff requests."
+      return render :submit_staff, status: :unprocessable_entity
+    end
 
-      # associate the selected PrintableModel and copy its STL
+    # FIDGET & ASSISTIVE: force FDM & attach chosen model
+    if @type.in?(%w[fidget assistive])
+      @job.print_type = PrintType.find_by!(code: 'fdm')
       if (pm_id = params.dig(:job, :printable_model_id)).present?
         pm = PrintableModel.find(pm_id)
         @job.printable_model = pm
@@ -55,23 +59,23 @@ class PortalController < ApplicationController
       end
     end
 
-    @job.category = Category.find_by!(name: params[:type].to_s.capitalize)
+    # common attrs
+    @job.category = Category.find_by!(name: @type.capitalize)
     @job.status   = Status.find_by!(code: 'pending')
 
+    # on recaptcha failure, re-render correct form
     unless verify_recaptcha(model: @job)
       flash.now[:alert] = @job.errors.full_messages.to_sentence
-      template = params[:type] == 'fidget' ? :submit_fidget : :submit_print
-      return render template, status: :unprocessable_entity
+      return render form_template_for(@type), status: :unprocessable_entity
     end
 
     send_magic_link
 
     if @job.save
-      redirect_to thank_you_path(kind: params[:type])
+      redirect_to thank_you_path(kind: @type)
     else
       flash.now[:alert] = @job.errors.full_messages.to_sentence
-      template = params[:type] == 'fidget' ? :submit_fidget : :submit_print
-      render template, status: :unprocessable_entity
+      render form_template_for(@type), status: :unprocessable_entity
     end
   end
 
@@ -232,6 +236,15 @@ class PortalController < ApplicationController
     @job = @patron.jobs.find(params[:id])
   end
 
+  def form_template_for(type)
+    case type
+    when 'fidget'    then :submit_fidget
+    when 'assistive' then :submit_assistive
+    when 'staff'     then :submit_staff
+    else                  :submit_print
+    end
+  end
+
   def print_job_params
     params.require(:job).permit(
       # regular-print fields
@@ -246,5 +259,4 @@ class PortalController < ApplicationController
       :print_type
     )
   end
-
 end

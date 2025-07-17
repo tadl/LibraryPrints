@@ -7,7 +7,12 @@
         <%= @job.is_a?(PrintJob) ? "Print Request" : "Scan Request" %>
         <small class="text-light">#<%= @job.id %></small>
       </h2>
-      <%= bootstrap_status_badge(@job.status) %>
+      <div class="d-flex align-items-center">
+        <%= bootstrap_status_badge(@job.status) %>
+        <% if @job.category.name == 'Staff' %>
+          <span class="badge bg-dark text-white ms-2">Staff</span>
+        <% end %>
+      </div>
     </div>
 
     <!-- Body -->
@@ -61,6 +66,9 @@
                 <%= link_to @job.model_file.filename,
                             rails_blob_path(@job.model_file, disposition: 'attachment'),
                             class: 'text-decoration-none' %>
+              </p>
+              <p>
+                <%= number_to_human_size(@job.model_file.blob.byte_size) %>
               </p>
             <% elsif @job.url.present? %>
               <p>
