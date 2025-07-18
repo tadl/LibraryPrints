@@ -69,9 +69,8 @@ class PortalController < ApplicationController
       return render form_template_for(@type), status: :unprocessable_entity
     end
 
-    send_magic_link
-
     if @job.save
+      JobMailer.job_received(@job).deliver_later
       redirect_to thank_you_path(kind: @type)
     else
       flash.now[:alert] = @job.errors.full_messages.to_sentence
@@ -98,9 +97,8 @@ class PortalController < ApplicationController
       return render :submit_scan, status: :unprocessable_entity
     end
 
-    send_magic_link
-
     if @job.save
+      JobMailer.job_received(@job).deliver_later
       redirect_to thank_you_path(kind: 'scan')
     else
       flash.now[:alert] = @job.errors.full_messages.to_sentence
@@ -174,17 +172,6 @@ class PortalController < ApplicationController
   def send_magic_link
     @patron.regenerate_access_token!
     PatronMailer.access_link(@patron).deliver_later
-  end
-
-  # Strong params for print jobs
-  def print_job_params
-    params.require(:job).permit(
-      :model_file,
-      :url,
-      :filament_color,
-      :notes,
-      :pickup_location
-    )
   end
 
   def scan_job_params

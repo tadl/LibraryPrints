@@ -1,5 +1,6 @@
 <main class="container my-5">
   <h1 class="mb-4">Staff 3D Print Request</h1>
+  <p class="help-text">TADL Staff may use this form to request 3D prints required for business purposes. If you'd like to print something for perosnal use, please use the <%= link_to 'patron form', submit_print_path %>.</p>
 
   <%= form_tag submit_staff_path,
         multipart: true,
@@ -128,7 +129,7 @@
           <div class="text-danger small mt-1"><%= @job.errors[:recaptcha].join(", ") %></div>
         <% end %>
         <span class="help-text">
-          This question is for testing whether or not you are a human visitor and to prevent automated spam submissions.
+          Help us prevent spam.
         </span>
       </div>
     </div>

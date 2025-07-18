@@ -1,7 +1,9 @@
-<!-- app/views/portal/submit_fidget.html.erb -->
 <main class="container my-5">
   <h1 class="mb-4">Free 3D Fidgets Request for Local IBCCES Partners</h1>
-  <p class="help-text">You are welcome to request up to ONE (1) free 3D printed fidget devices per month. You will be notified via email when your items are ready to pick up.  Please note that your request will be put in the queue with other patrons requests. It can take up to 2 weeks to be notified your devices are ready for pick up.</p>
+  <p class="help-text">
+    You are welcome to request up to ONE (1) free 3D printed fidget device per month. You will be notified via email when your items are ready to pick up.  
+    Please note that your request will be put in the queue with other patron requests. It can take up to 2 weeks to be notified your device is ready for pick up.
+  </p>
 
   <%= form_tag submit_fidget_path,
         multipart: true,
@@ -43,29 +45,58 @@
       </div>
     </div>
 
-    <!-- Model -->
+    <!-- Device Model -->
+    <style>
+      .device-option {
+        flex: 0 0 calc(33.333% - 1rem);
+        border: 2px solid transparent;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        cursor: pointer;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      .device-option.selected {
+        border-color: #2563eb;
+      }
+      .device-option img {
+        display: block;
+        margin: 0 auto 0.75rem;
+        max-width: 100%;
+        height: auto;
+      }
+      .device-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+    </style>
+
     <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Model</h4>
-      </div>
+      <div class="card-header"><h4 class="mb-0">Device</h4></div>
       <div class="card-body">
-        <% fidget_category = Category.find_by!(name: 'Fidget') %>
-        <div class="d-flex flex-wrap">
-          <% fidget_category.printable_models.order(:position).each do |pm| %>
-            <div class="form-check me-4 mb-4">
+        <div class="device-container">
+          <% @printable_models.each do |pm| %>
+            <div class="device-option" data-radio-id="job_printable_model_<%= pm.code %>">
               <%= radio_button_tag 'job[printable_model_id]',
                     pm.id,
                     params.dig(:job, :printable_model_id).to_s == pm.id.to_s,
                     id: "job_printable_model_#{pm.code}",
-                    class: 'form-check-input',
+                    class: 'd-none',
                     required: true %>
-              <%= label_tag "job_printable_model_#{pm.code}",
-                    pm.name,
-                    class: 'form-check-label d-block' %>
+
+              <label for="job_printable_model_<%= pm.code %>" class="d-block mb-2">
+                <strong><%= pm.name %></strong>
+              </label>
+
               <% if pm.preview_image.attached? %>
-                <%= image_tag pm.preview_image.variant(resize_to_limit: [100, 100]),
+                <%= image_tag pm.preview_image.variant(resize_to_limit: [300, 300]),
                       alt: pm.name,
-                      class: 'img-thumbnail mt-2' %>
+                      class: 'img-thumbnail' %>
+              <% end %>
+
+              <% if pm.notes.present? %>
+                <p class="small text-muted mt-2"><%= pm.notes %></p>
               <% end %>
             </div>
           <% end %>
@@ -73,11 +104,29 @@
       </div>
     </div>
 
+    <script>
+      document.addEventListener('turbo:load', () => {
+        const options = document.querySelectorAll('.device-option')
+        function selectOption(radio) {
+          options.forEach(o => o.classList.remove('selected'))
+          const container = document.querySelector(`[data-radio-id="${radio.id}"]`)
+          if (container) container.classList.add('selected')
+        }
+        options.forEach(option => {
+          const radio = document.getElementById(option.dataset.radioId)
+          if (radio.checked) selectOption(radio)
+          option.addEventListener('click', () => {
+            radio.checked = true
+            selectOption(radio)
+          })
+          radio.addEventListener('change', () => selectOption(radio))
+        })
+      })
+    </script>
+
     <!-- Color -->
     <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Color</h4>
-      </div>
+      <div class="card-header"><h4 class="mb-0">Color</h4></div>
       <div class="card-body">
         <%= label_tag 'job[filament_color]', 'Choose a Color', class: 'form-label' %>
         <%= select_tag 'job[filament_color]',
@@ -95,9 +144,7 @@
 
     <!-- Company/Organization Name -->
     <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Company/Organization Name</h4>
-      </div>
+      <div class="card-header"><h4 class="mb-0">Company/Organization Name</h4></div>
       <div class="card-body">
         <%= label_tag 'job[notes]', 'Company/Organization Name', class: 'form-label' %>
         <%= text_area_tag 'job[notes]',
@@ -111,9 +158,7 @@
 
     <!-- Pickup Location -->
     <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Pickup Location</h4>
-      </div>
+      <div class="card-header"><h4 class="mb-0">Pickup Location</h4></div>
       <div class="card-body">
         <%= label_tag 'job[pickup_location]', 'Where will you pick up your print?', class: 'form-label' %>
         <%= select_tag 'job[pickup_location]',
@@ -132,9 +177,7 @@
 
     <!-- CAPTCHA -->
     <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">CAPTCHA</h4>
-      </div>
+      <div class="card-header"><h4 class="mb-0">CAPTCHA</h4></div>
       <div class="card-body">
         <%= recaptcha_tags %>
         <% if @job&.errors&.[](:recaptcha).present? %>
@@ -143,7 +186,7 @@
           </div>
         <% end %>
         <span class="help-text">
-          This question is for testing whether or not you are a human visitor and to prevent spam.
+          Help us prevent spam.
         </span>
       </div>
     </div>
@@ -154,7 +197,8 @@
     </div>
 
     <p class="form-text text-muted mt-4">
-      After receiving your submission, we'll get back to you within 48 hours (usually much sooner) with details on print time, filament usage, cost, or any questions we have.
+      After receiving your submission, we'll get back to you within 48 hours (usually much sooner) 
+      with details on print time, filament usage, cost, or any questions we have.
     </p>
   <% end %>
 </main>

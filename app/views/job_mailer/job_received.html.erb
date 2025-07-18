@@ -1,0 +1,16 @@
+<p>Hello <%= @patron.name %>,</p>
+
+<p>Thank you for submitting your <strong><%= @job.is_a?(PrintJob) ? '3D print' : 'scan' %> job request</strong> (<strong>#<%= @job.id %></strong>) to the TADL Makerspace Portal. We’ve received your submission and will begin processing it shortly.</p>
+
+<p>You can view the status of your request, ask follow-up questions, or reply directly to this email (it will go into your job’s conversation thread) by clicking the button below:</p>
+
+<p style="text-align:center;">
+  <a href="<%= @url %>" style="display:inline-block;background-color:#2563EB;color:#FFFFFF;padding:0.5rem 1rem;text-decoration:none;border-radius:4px;">
+    View Your Job Request
+  </a>
+</p>
+
+<p>If you need anything else in the meantime, just reply to this message.</p>
+
+<p>Thanks,<br>
+The TADL Makerspace Team</p>

@@ -2,6 +2,21 @@
 class JobMailer < ApplicationMailer
   MAIL_DOMAIN = ENV.fetch("MAILGUN_DOMAIN")
 
+  def job_received(job)
+    @job          = job
+    @patron       = job.patron
+    @conversation = @job.conversation || @job.create_conversation!
+    @url          = job_url(@job, token: @patron.access_token)
+
+    reply_address = "MAKE at TADL <make+#{@conversation.conversation_token}@#{MAILGUN_DOMAIN}>"
+
+    mail to:      @patron.email,
+         from:    reply_address,
+         reply_to: reply_address,
+         subject: "We’ve received your #{@job.is_a?(PrintJob) ? 'print' : 'scan'} job ##{@job.id}"
+  end
+
+
   def notify_patron(message)
     @message      = message
     @conversation = message.conversation
@@ -11,7 +26,7 @@ class JobMailer < ApplicationMailer
     @url = job_url(@job, token: @patron.access_token)
 
     # use the conversation’s conversation_token for plus‐addressing
-    reply_address = "TADL Makerspace <make+#{@conversation.conversation_token}@make.tadl.org>"
+    reply_address = "MAKE at TADL <make+#{@conversation.conversation_token}@#{MAILGUN_DOMAIN}>"
 
     job_label = @job.is_a?(PrintJob) ? "print" : "scan"
 
