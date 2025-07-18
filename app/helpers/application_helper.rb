@@ -1,17 +1,26 @@
+# app/helpers/application_helper.rb
 module ApplicationHelper
-  # Returns an Array of crumb hashes: { name:, path: (optional) }
-  def breadcrumb_items
-    # Don’t show on any of these “public” form pages
-    skip = %w[
+  # Pages where we hide both breadcrumb & logout
+  PUBLIC_PAGES = {
+    'portal'  => %w[
+      home
       submit_print create_print_job
       submit_scan  create_scan_job
       token_request send_token
       token_thank_you thank_you
     ]
-    return [] if controller_name == 'portal' && skip.include?(action_name)
+  }.freeze
+
+  # Pages where we hide only the breadcrumb (but still show logout)
+  REPORT_PRINT_ACTIONS = {
+    'reports' => %w[print]
+  }.freeze
+
+  # Returns an Array of crumb hashes: { name:, path: (optional) }
+  def breadcrumb_items
+    return [] if PUBLIC_PAGES[controller_name]&.include?(action_name)
 
     items = []
-    # always start with Home
     items << { name: 'Home', path: root_path }
 
     if controller_name == 'portal'
@@ -25,5 +34,17 @@ module ApplicationHelper
     end
 
     items
+  end
+
+  # Should we hide the breadcrumb entirely?
+  def hide_breadcrumb?
+    PUBLIC_PAGES[controller_name]&.include?(action_name) ||
+      REPORT_PRINT_ACTIONS[controller_name]&.include?(action_name)
+  end
+
+  # Should we hide the logout button?
+  def hide_logout?
+    # hide on exactly the “public” portal pages (including home)
+    PUBLIC_PAGES[controller_name]&.include?(action_name)
   end
 end

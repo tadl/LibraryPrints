@@ -2,34 +2,18 @@
 <% items = breadcrumb_items.presence || [] %>
 <% return if items.size < 2 %>
 
-<div class="container d-flex justify-content-between align-items-center py-2">
-  <!-- Breadcrumb trail -->
-  <nav aria-label="breadcrumb" class="m-0 p-0">
-    <ol class="breadcrumb mb-0">
-      <% items.each_with_index do |item, index| %>
-        <% is_last = index == items.size - 1 %>
-        <li class="breadcrumb-item <%= 'active' if is_last %>" <%= 'aria-current="page"' if is_last %>>
-          <% if !is_last && item[:path].present? %>
-            <%= link_to item[:name], item[:path] %>
-          <% else %>
-            <%= item[:name] %>
-          <% end %>
-        </li>
-      <% end %>
-    </ol>
-  </nav>
-
-  <!-- Patron greeting & log-out -->
-  <% if current_patron %>
-    <div class="text-end">
-      <small class="text-muted me-2">
-        Welcome, <%= current_patron.name.split.first %>!
-      </small>
-      <%= button_to "Log out",
-            logout_path,
-            method: :delete,
-            form: { class: "d-inline" },
-            class: "btn btn-sm btn-outline-secondary" %>
-    </div>
-  <% end %>
-</div>
+<!-- Breadcrumb trail -->
+<nav aria-label="breadcrumb" class="m-0 p-0">
+  <ol class="breadcrumb mb-0">
+    <% items.each_with_index do |item, index| %>
+      <% is_last = index == items.size - 1 %>
+      <li class="breadcrumb-item <%= 'active' if is_last %>" <%= 'aria-current="page"' if is_last %>>
+        <% if !is_last && item[:path].present? %>
+          <%= link_to item[:name], item[:path] %>
+        <% else %>
+          <%= item[:name] %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</nav>

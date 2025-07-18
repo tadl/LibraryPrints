@@ -138,6 +138,9 @@ RailsAdmin.config do |config|
         field :slicer_weight
         field :slicer_cost
         field :actual_weight
+        field :resin_volume_ml do
+          label "Resin Volume (mL)"
+        end
         field :actual_cost
         field :completion_date
         field :assigned_printer
@@ -228,10 +231,23 @@ RailsAdmin.config do |config|
           enum          { FilamentColor.order(:name).pluck(:name, :code) }
           default_value { bindings[:object].filament_color }
         end
+        field :quantity, :integer do
+          label "Quantity"
+          help "Number of copies printed"
+        end
         field :print_time_estimate
-        field :slicer_weight
+        field :slicer_weight do
+          label "Estimated weight (grams)"
+        end
         field :slicer_cost
-        field :actual_weight
+        field :resin_volume_ml do
+          label "Resin Volume (mL)"
+          help  "How many milliliters of resin were used?"
+        end
+        field :actual_weight do
+          label "Weight (grams)"
+          help "How many grams is the finished print?"
+        end
         field :actual_cost
         field :completion_date, :date
         field :assigned_printer, :belongs_to_association do

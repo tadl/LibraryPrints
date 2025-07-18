@@ -16,7 +16,14 @@
 
   <body>
     <%= render "shared/header" %>
-    <%= render "shared/breadcrumb" %>
+    <div class="container d-flex justify-content-between align-items-center py-2">
+      <% unless hide_breadcrumb? %>
+        <%= render "shared/breadcrumb" %>
+      <% end %>
+      <% unless hide_logout? %>
+        <%= render "shared/logout_button" %>
+      <% end %>
+    </div>
     <div class="px-4">
       <%= render "shared/flashes" %>
     </div>

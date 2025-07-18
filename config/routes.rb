@@ -56,6 +56,8 @@ Rails.application.routes.draw do
   get  '/jobs/:id',                 to: 'portal#show',           as: :job
   post '/jobs/:id/conversation',    to: 'portal#create_message', as: :job_conversation
 
+  get "/reports/print", to: "reports#print", as: :print_report
+
   # Health check endpoint
   get '/up', to: 'rails/health#show', as: :rails_health_check
 

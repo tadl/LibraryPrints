@@ -1,0 +1,11 @@
+<!-- app/views/shared/_logout_button.html.erb -->
+<% if current_staff_user || current_patron %>
+  <div class="text-end ms-auto">
+    <small class="text-muted me-2">
+      Welcome, <%= (current_staff_user&.name || current_patron&.name).to_s.split.first %>!
+    </small>
+    <%= button_to "Log out", logout_path, method: :delete,
+          form: { class: "d-inline" },
+          class: "btn btn-sm btn-outline-secondary" %>
+  </div>
+<% end %>

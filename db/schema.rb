@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_16_213246) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_18_184431) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -88,6 +88,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_16_213246) do
     t.string "print_type_code"
     t.bigint "category_id", null: false
     t.bigint "printable_model_id"
+    t.decimal "resin_volume_ml", precision: 8, scale: 2
+    t.integer "quantity"
     t.index ["assigned_printer_id"], name: "index_jobs_on_assigned_printer_id"
     t.index ["category_id"], name: "index_jobs_on_category_id"
     t.index ["patron_id"], name: "index_jobs_on_patron_id"
