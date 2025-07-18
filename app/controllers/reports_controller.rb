@@ -1,53 +1,68 @@
 # app/controllers/reports_controller.rb
 class ReportsController < ApplicationController
+  include ActionController::MimeResponds
+
   before_action :authenticate_staff!
 
-  # GET /reports/print
+  # GET /reports/print(.:format)
   def print
-    # Pick a year/month (fallback to last month)
+    # pick a year/month (fallback to last month)
     year  = params[:year].to_i.nonzero?  || (Date.current - 1.month).year
     month = params[:month].to_i.nonzero? || (Date.current - 1.month).month
     @period = Date.new(year, month)
 
-    # Only count jobs that have either a completion_date in this month
-    # or that were cancelled (i.e. status = 'cancelled') last updated in this month
-    completed_this_month = PrintJob.where(completion_date: @period.all_month)
-    cancelled_this_month = PrintJob
-                             .joins(:status)
-                             .where(statuses: { code: 'cancelled' })
-                             .where(updated_at: @period.all_month)
+    completed = PrintJob.where(completion_date: @period.all_month)
+    cancelled = PrintJob
+                  .joins(:status)
+                  .where(statuses: { code: 'cancelled' })
+                  .where(updated_at: @period.all_month)
 
-    @orders_count     = completed_this_month.count
-    @cancelled_count  = cancelled_this_month.count
-    @distinct_patrons = (completed_this_month + cancelled_this_month)
-                          .map(&:patron_id).uniq.size
+    # union both sets
+    job_ids = completed.ids + cancelled.ids
+    jobs    = PrintJob.where(id: job_ids)
 
-    fdm   = completed_this_month.joins(:print_type).where(print_types: { code: 'fdm' })
-    resin = completed_this_month.joins(:print_type).where(print_types: { code: 'resin' })
-    @fdm_count        = fdm.count
-    @resin_count      = resin.count
-    @resin_ml         = resin.sum(:resin_volume_ml).to_i
+    # counts
+    @orders_count     = completed.count
+    @cancelled_count  = cancelled.count
+    @distinct_patrons = jobs.select(:patron_id).distinct.count
+
+    # fdm / resin only on completed
+    fdm_scope   = completed.joins(:print_type).where(print_types: { code: 'fdm' })
+    resin_scope = completed.joins(:print_type).where(print_types: { code: 'resin' })
+
+    @fdm_count      = fdm_scope.count
+    @resin_count    = resin_scope.count
+    @resin_ml       = resin_scope.sum(:resin_volume_ml).to_i
+
+    # multi-color across both
+    @multiple_count = jobs.where(filament_color: 'multiple').count
 
     # total quantity (staff-entered)
-    @total_quantity   = completed_this_month.sum(:quantity)
+    @total_quantity = completed.sum(:quantity)
 
-    # unique designs
-    unique_model_ids = completed_this_month.where.not(printable_model_id: nil)
-                              .pluck(:printable_model_id).uniq.size
-    other_designs    = (
-      completed_this_month.where(printable_model_id: nil).pluck(:url) +
-      completed_this_month.select { |j| j.model_file.attached? }
-                           .map { |j| j.model_file.filename.to_s }
-    ).uniq.size
-    @unique_designs  = unique_model_ids + other_designs
+    # unique designs among completed only
+    pm_count       = completed.where.not(printable_model_id: nil)
+                              .distinct
+                              .count(:printable_model_id)
+    jobs_without_pm = completed.where(printable_model_id: nil)
+    urls           = jobs_without_pm.pluck(:url).reject(&:blank?)
+    files          = jobs_without_pm
+                       .select { |j| j.model_file.attached? }
+                       .map { |j| j.model_file.filename.to_s }
+    @unique_designs = pm_count + (urls + files).uniq.size
 
-    @filament_grams  = fdm.sum(:slicer_weight).to_i
+    @filament_grams  = fdm_scope.sum(:slicer_weight).to_i
 
-    # breakdown by category name
-    @category_counts = (completed_this_month + cancelled_this_month)
-                         .group_by(&:category)
-                         .transform_keys(&:name)
-                         .transform_values(&:size)
+    # breakdown by category over all jobs
+    @category_counts = jobs
+                         .joins(:category)
+                         .group('categories.name')
+                         .count
+
+    respond_to do |format|
+      format.html
+      format.json
+    end
   end
 
   private
