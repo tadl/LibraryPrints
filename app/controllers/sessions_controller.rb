@@ -5,7 +5,9 @@ class SessionsController < ApplicationController
     auth  = request.env['omniauth.auth']
     staff = StaffUser.from_omniauth(auth)
     session[:staff_user_id] = staff.id
-    redirect_to rails_admin.dashboard_path
+
+    return_to = session.delete(:user_return_to)
+    redirect_to (return_to || rails_admin.dashboard_path)
   end
 
   # DELETE /logout

@@ -56,6 +56,7 @@ class ReportsController < ApplicationController
   def authenticate_staff!
     return if current_staff_user
 
+    session[:user_return_to] = request.fullpath
     redirect_to '/auth/google_oauth2'
   end
 end
