@@ -21,7 +21,7 @@ default: &default
 
 development:
   <<: *default
-  database: library_prints_development
+  database: make_at_tadl_development
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -55,7 +55,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: library_prints_test
+  database: make_at_tadl_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -79,6 +79,6 @@ test:
 #
 production:
   <<: *default
-  database: library_prints_production
-  username: library_prints
-  password: <%= ENV["LIBRARY_PRINTS_DATABASE_PASSWORD"] %>
+  database: make_at_tadl_production
+  username: make_at_tadl
+  password: <%= ENV["MAKE_AT_TADL_DATABASE_PASSWORD"] %>
