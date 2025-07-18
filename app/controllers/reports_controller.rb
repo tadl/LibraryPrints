@@ -51,7 +51,7 @@ class ReportsController < ApplicationController
                        .map { |j| j.model_file.filename.to_s }
     @unique_designs = pm_count + (urls + files).uniq.size
 
-    @filament_grams  = fdm_scope.sum(:slicer_weight).to_i
+    @filament_grams  = fdm_scope.sum(:actual_weight).to_i
 
     # breakdown by category over all jobs
     @category_counts = jobs
