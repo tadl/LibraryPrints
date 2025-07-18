@@ -1,25 +1,56 @@
 <%# app/views/rails_admin/main/dashboard.html.erb %>
-<% statuses = Status.order(:position) %>
 
-<div class="container py-4">
-  <div class="row g-3 mb-5">
-    <% statuses.each do |status| %>
-      <% count = Job.with_status(status.code).count %>
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <%= link_to(
-              rails_admin.index_path(
-                model_name: 'job',
-                f: { status: { status.id.to_s => { o: 'is', v: status.name } } }
-              ),
-              class: "card h-100 text-decoration-none #{'border-primary' if count.positive?}"
-            ) do %>
-          <div class="card-body text-center">
-            <h5 class="card-title"><%= status.name %></h5>
-            <p class="display-6 mb-0"><%= count %></p>
+<div class="container-fluid py-4">
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h3 class="mb-0">Public Forms</h3>
+    </div>
+    <div class="card-body">
+      <div class="btn-toolbar" role="toolbar" aria-label="Public form links">
+        <div class="btn-group me-2" role="group" aria-label="Print">
+          <%= link_to '3D Print Request', main_app.submit_print_path, class: 'btn btn-primary', target: '_blank' %>
+        </div>
+        <div class="btn-group me-2" role="group" aria-label="Scan">
+          <%= link_to 'Scan Request', main_app.submit_scan_path, class: 'btn btn-primary', target: '_blank' %>
+        </div>
+        <div class="btn-group me-2" role="group" aria-label="Fidget">
+          <%= link_to 'Fidget Request', main_app.submit_fidget_path, class: 'btn btn-primary', target: '_blank' %>
+        </div>
+        <div class="btn-group me-2" role="group" aria-label="Assistive">
+          <%= link_to 'Assistive Request', main_app.submit_assistive_path, class: 'btn btn-primary', target: '_blank' %>
+        </div>
+        <div class="btn-group" role="group" aria-label="Staff">
+          <%= link_to 'Staff Print Request', main_app.submit_staff_path, class: 'btn btn-primary', target: '_blank' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h3 class="mb-0">Tickets in Status</h3>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <% Status.order(:position).each do |status| %>
+          <% count = Job.with_status(status.code).count %>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <%= link_to(
+                  rails_admin.index_path(
+                    model_name: 'job',
+                    f: { status => { status.id.to_s => { o: 'is', v: status.name } } }
+                  ),
+                  class: "card h-100 text-decoration-none #{'border-primary' if count.positive?}"
+                ) do %>
+              <div class="card-body text-center">
+                <h5 class="card-title mb-1"><%= status.name %></h5>
+                <p class="display-6 mb-0"><%= count %></p>
+              </div>
+            <% end %>
           </div>
         <% end %>
       </div>
-    <% end %>
+    </div>
   </div>
 
   <% unread_by_job = Message.unread.joins(conversation: :job)
@@ -29,7 +60,7 @@
   <% if unread_by_job.any? %>
     <div class="card mb-4">
       <div class="card-header">
-        <i class="bi bi-chat-dots"></i> <strong>Unread Messages</strong>
+        <h3 class="mb-0">Unread Messages</h3>
       </div>
       <ul class="list-group list-group-flush">
         <% unread_by_job.each do |row| %>
@@ -50,10 +81,9 @@
   <% else %>
     <div class="card mb-4">
       <div class="card-header">
-        <i class="bi bi-chat-dots"></i> <strong>No Unread Messages</strong>
+        <h3 class="mb-0">No Unread Messages</h3>
       </div>
       <h3 class="m-3">Hooray!</h3>
     </div>
   <% end %>
-
 </div>

@@ -1,0 +1,23 @@
+<!-- app/views/portal/_patron_fields.html.erb -->
+<div class="card mb-4">
+  <div class="card-header"><h4 class="mb-0">Name</h4></div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <%= label_tag 'patron[first_name]', 'First Name', class: 'form-label' %>
+        <%= text_field_tag 'patron[first_name]', params.dig(:patron, :first_name),
+              id: 'patron_first_name', class: 'form-control', required: true %>
+      </div>
+      <div class="col-md-6">
+        <%= label_tag 'patron[last_name]', 'Last Name', class: 'form-label' %>
+        <%= text_field_tag 'patron[last_name]', params.dig(:patron, :last_name),
+              id: 'patron_last_name', class: 'form-control', required: true %>
+      </div>
+    </div>
+    <div class="mt-3">
+      <%= label_tag 'patron[email]', 'Email Address', class: 'form-label' %>
+      <%= email_field_tag 'patron[email]', params.dig(:patron, :email),
+            id: 'patron_email', class: 'form-control', required: true %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="card mb-4">
+  <div class="card-header">
+    <h4 class="mb-0">Spray Coating OK?</h4>
+  </div>
+  <div class="card-body">
+    <%= label_tag 'job[spray_ok]', 'May we apply scanning spray?', class: 'form-label' %>
+    <%= select_tag 'job[spray_ok]',
+    options_for_select([['Yes, you may spray-coat', true],
+                        ['No, please don’t',           false]],
+                        params.dig(:job, :spray_ok)),
+                        prompt: 'Select an option',
+                        id: 'job_spray_ok',
+                        class: 'form-select' %>
+    <div class="form-text">
+      Some objects are reflective or dark—spray helps the scanner capture details.
+    </div>
+  </div>
+</div>

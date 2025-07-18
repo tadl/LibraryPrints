@@ -1,140 +1,23 @@
-<!-- app/views/portal/submit_scan.html.erb -->
 <main class="container my-5">
-  <h1 class="mb-4">3D Scan Request</h1>
+  <h1 class="mb-4">Request a 3D Scan</h1>
 
   <%= form_tag submit_scan_path,
         multipart: true,
         local: true,
-        data: { turbo: false } do %>`
+        data: { turbo: false } do %>
 
-    <!-- Name -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Name</h4>
-      </div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <%= label_tag 'patron[first_name]', 'First Name', class: 'form-label' %>
-            <%= text_field_tag 'patron[first_name]',
-                  params.dig(:patron, :first_name),
-                  id: 'patron_first_name',
-                  class: 'form-control',
-                  required: true %>
-          </div>
-          <div class="col-md-6">
-            <%= label_tag 'patron[last_name]', 'Last Name', class: 'form-label' %>
-            <%= text_field_tag 'patron[last_name]',
-                  params.dig(:patron, :last_name),
-                  id: 'patron_last_name',
-                  class: 'form-control',
-                  required: true %>
-          </div>
-        </div>
-        <div class="mt-3">
-          <%= label_tag 'patron[email]', 'Email Address', class: 'form-label' %>
-          <%= email_field_tag 'patron[email]',
-                params.dig(:patron, :email),
-                id: 'patron_email',
-                class: 'form-control',
-                required: true %>
-        </div>
-      </div>
-    </div>
-
-    <!-- Photo -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Photo of the Object</h4>
-      </div>
-      <div class="card-body">
-        <%= label_tag 'job[scan_image]', 'Upload Photo', class: 'form-label' %>
-        <%= file_field_tag 'job[scan_image]',
-              accept: 'image/*',
-              id: 'job_scan_image',
-              class: 'form-control' %>
-        <div class="form-text">
-          Upload a high-res photo of your object (include a ruler or common item for scale).
-        </div>
-      </div>
-    </div>
-
-    <!-- Spray Coating -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Spray Coating OK?</h4>
-      </div>
-      <div class="card-body">
-        <%= label_tag 'job[spray_ok]', 'May we apply scanning spray?', class: 'form-label' %>
-        <%= select_tag 'job[spray_ok]',
-              options_for_select([['Yes, you may spray-coat', true],
-                                  ['No, please don’t',           false]],
-                                 params.dig(:job, :spray_ok)),
-              prompt: 'Select an option',
-              id: 'job_spray_ok',
-              class: 'form-select' %>
-        <div class="form-text">
-          Some objects are reflective or dark—spray helps the scanner capture details.
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Notes</h4>
-      </div>
-      <div class="card-body">
-        <%= label_tag 'job[notes]', 'Describe the object / special instructions', class: 'form-label' %>
-        <%= text_area_tag 'job[notes]',
-              params.dig(:job, :notes),
-              id: 'job_notes',
-              rows: 4,
-              placeholder: 'e.g. fragile, brass fittings…',
-              class: 'form-control' %>
-      </div>
-    </div>
-
-    <!-- Pickup Location -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">Pickup Location</h4>
-      </div>
-      <div class="card-body">
-        <%= label_tag 'job[pickup_location]', 'Choose scanner location', class: 'form-label' %>
-        <%= select_tag 'job[pickup_location]',
-              options_from_collection_for_select(
-                PickupLocation.where(scanner: true).order(:position),
-                :code, :name,
-                params.dig(:job, :pickup_location) || PickupLocation.where(scanner: true).order(:position).first&.code
-              ),
-              prompt: 'Select location',
-              id: 'job_pickup_location',
-              class: 'form-select' %>
-        <div class="form-text">
-          Select the branch where you’ll drop off your object.
-        </div>
-      </div>
-    </div>
-
-    <!-- CAPTCHA -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="mb-0">CAPTCHA</h4>
-      </div>
-      <div class="card-body">
-        <%= recaptcha_tags %>
-        <% if @job.errors[:recaptcha].present? %>
-          <div class="text-danger small mt-1"><%= @job.errors[:recaptcha].join(", ") %></div>
-        <% end %>
-        <span class="help-text">Help us prevent spam.</span>
-      </div>
-    </div>
-
-    <!-- Submit -->
-    <div class="text-end">
-      <%= submit_tag 'Submit Scan Request', class: 'btn btn-primary btn-lg' %>
-    </div>
-
+    <%= render 'portal/patron_fields' %>
+    <%= render 'portal/scan_image_field' %>
+    <%= render 'portal/spray_ok' %>
+    <%= render 'portal/notes_field',
+                header: 'Description',
+                label: 'Description',
+                placeholder: 'What would you like us to scan?',
+                help_text: nil %>
+    <%= render 'portal/pickup_location', require_scanner: true %>
+    <%= render 'portal/captcha' %>
+    <%= render 'portal/submit_button',
+                submit_label: 'Submit Scan Request',
+                submit_help: "We’ll email you when your scan is ready for pick-up." %>
   <% end %>
 </main>

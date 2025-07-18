@@ -1,0 +1,51 @@
+<!-- app/views/portal/_device_selector.html.erb -->
+<div class="card mb-4">
+  <div class="card-header"><h4 class="mb-0">Device</h4></div>
+  <div class="card-body">
+    <div class="device-container d-flex flex-wrap gap-3">
+      <% @printable_models.each do |pm| %>
+        <div class="device-option" data-radio-id="job_printable_model_<%= pm.code %>">
+          <%= radio_button_tag 'job[printable_model_id]', pm.id,
+                params.dig(:job, :printable_model_id).to_s == pm.id.to_s,
+                id: "job_printable_model_#{pm.code}", class: 'd-none', required: true %>
+          <label for="job_printable_model_<%= pm.code %>" class="d-block mb-2">
+            <strong><%= pm.name %></strong>
+          </label>
+          <% if pm.preview_image.attached? %>
+            <%= image_tag pm.preview_image.variant(resize_to_limit: [250,250]),
+                  alt: pm.name, class: 'img-thumbnail' %>
+          <% end %>
+          <% if pm.notes.present? %>
+            <p class="small text-muted mt-2"><%= pm.notes %></p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+.device-option {
+  flex: 0 0 calc(33.333% - 1rem);
+  border: 2px solid transparent;
+  border-radius: .5rem;
+  padding: .75rem;
+  cursor: pointer;
+  text-align: center;
+}
+.device-option.selected { border-color: #2563eb; }
+.device-option img { max-width: 100%; height: auto; margin: 0 auto .75rem; }
+</style>
+<script>
+document.addEventListener('turbo:load', () => {
+  document.querySelectorAll('.device-option').forEach(opt => {
+    let radio = document.getElementById(opt.dataset.radioId);
+    if (radio.checked) opt.classList.add('selected');
+    opt.addEventListener('click', () => {
+      radio.checked = true;
+      document.querySelectorAll('.device-option').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+});
+</script>

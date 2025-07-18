@@ -1,0 +1,28 @@
+<!-- app/views/portal/_pickup_location.html.erb -->
+<div class="card mb-4">
+  <div class="card-header"><h4 class="mb-0">Pickup Location</h4></div>
+  <div class="card-body">
+    <%= label_tag 'job[pickup_location]', 'Where will you pick up your print?', class: 'form-label' %>
+    <%  
+      # if require_scanner is true, only show active locations with scanners  
+      locations = if local_assigns[:require_scanner]  
+        PickupLocation.active.where(scanner: true)  
+      else  
+        PickupLocation.active  
+      end.order(:position)
+    %>
+    <%= select_tag 'job[pickup_location]',
+          options_for_select(locations.pluck(:name, :code),
+                             params.dig(:job, :pickup_location) || locations.first&.code),
+          id: 'job_pickup_location',
+          class: 'form-select',
+          required: true %>
+    <span class="help-text">
+      <%= if local_assigns[:require_scanner]  
+            "Only locations with an active 3D scanner appear here."  
+          else  
+            "We’ll print at your chosen library. Only locations with active printers appear here."  
+          end %>
+    </span>
+  </div>
+</div>

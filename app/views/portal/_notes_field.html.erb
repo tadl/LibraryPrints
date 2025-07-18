@@ -1,0 +1,13 @@
+<!-- app/views/portal/_notes_field.html.erb -->
+<%# locals: header:, label:, placeholder:, help_text: %>
+<div class="card mb-4">
+  <div class="card-header"><h4 class="mb-0"><%= header %></h4></div>
+  <div class="card-body">
+    <%= label_tag 'job[notes]', label, class: 'form-label' %>
+    <%= text_area_tag 'job[notes]', params.dig(:job, :notes),
+          id: 'job_notes', rows: 4, placeholder: placeholder, class: 'form-control' %>
+    <% if help_text %>
+      <span class="help-text"><%= help_text %></span>
+    <% end %>
+  </div>
+</div>

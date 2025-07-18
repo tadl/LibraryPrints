@@ -1,0 +1,14 @@
+<!-- app/views/portal/_model_upload_or_url.html.erb -->
+<div class="card mb-4">
+  <div class="card-header"><h4 class="mb-0">Model</h4></div>
+  <div class="card-body">
+    <%= label_tag 'job[model_file]', 'Upload a Model File', class: 'form-label' %>
+    <%= file_field_tag 'job[model_file]', accept: '.stl,.obj,.3mf',
+          id: 'job_model_file', class: 'form-control' %>
+    <div class="form-text">Allowed types: STL, OBJ, 3MF.</div>
+    <br/>
+    <%= label_tag 'job[url]', 'Or paste a URL to a Model here', class: 'form-label' %>
+    <%= url_field_tag 'job[url]', params.dig(:job, :url),
+          id: 'job_url', class: 'form-control' %>
+  </div>
+</div>

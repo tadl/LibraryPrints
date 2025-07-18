@@ -1,0 +1,11 @@
+<!-- app/views/portal/_captcha.html.erb -->
+<div class="card mb-4">
+  <div class="card-header"><h4 class="mb-0">Verification</h4></div>
+  <div class="card-body">
+    <%= recaptcha_tags %>
+    <% if defined?(@job) && @job.errors[:recaptcha].present? %>
+      <div class="text-danger small mt-1"><%= @job.errors[:recaptcha].join(', ') %></div>
+    <% end %>
+    <span class="help-text">Help us keep automated submissions out.</span>
+  </div>
+</div>

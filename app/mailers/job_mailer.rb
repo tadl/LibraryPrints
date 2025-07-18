@@ -8,7 +8,7 @@ class JobMailer < ApplicationMailer
     @conversation = @job.conversation || @job.create_conversation!
     @url          = job_url(@job, token: @patron.access_token)
 
-    reply_address = "MAKE at TADL <make+#{@conversation.conversation_token}@#{MAILGUN_DOMAIN}>"
+    reply_address = "MAKE at TADL <make+#{@conversation.conversation_token}@#{MAIL_DOMAIN}>"
 
     mail to:      @patron.email,
          from:    reply_address,
@@ -26,7 +26,7 @@ class JobMailer < ApplicationMailer
     @url = job_url(@job, token: @patron.access_token)
 
     # use the conversation’s conversation_token for plus‐addressing
-    reply_address = "MAKE at TADL <make+#{@conversation.conversation_token}@#{MAILGUN_DOMAIN}>"
+    reply_address = "MAKE at TADL <make+#{@conversation.conversation_token}@#{MAIL_DOMAIN}>"
 
     job_label = @job.is_a?(PrintJob) ? "print" : "scan"
 

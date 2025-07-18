@@ -333,6 +333,9 @@ GEM
       sprockets-rails
       tilt
     securerandom (0.4.1)
+    seed_dump (3.3.1)
+      activerecord (>= 4)
+      activesupport (>= 4)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
@@ -402,6 +405,7 @@ DEPENDENCIES
   rails_admin
   recaptcha
   sassc-rails
+  seed_dump
   sprockets-rails
   stimulus-rails
   turbo-rails
